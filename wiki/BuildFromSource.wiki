@@ -8,8 +8,15 @@
 
 == Ubuntu 11.10 ==
 
-  # {{{apt-get install build-essential devscripts fakeroot}}}
-  # {{{apt-get install libqt4-dev libqtwebkit-dev libphonon-dev}}}
+  # {{{sudo apt-get install build-essential devscripts fakeroot}}}
+  # {{{sudo apt-get install libqt4-dev libqtwebkit-dev libphonon-dev}}}
+
+== Ubuntu 10.04 ==
+
+  # Add Kubuntu PPA: {{{sudo add-apt-repository ppa:kubuntu-ppa/backports}}}
+  # {{{sudo apt-get update}}}
+  # {{{sudo apt-get install build-essential devscripts fakeroot}}}
+  # {{{sudo apt-get install libqt4-dev libqtwebkit-dev libphonon-dev}}}
 
 == Create package ==
 
