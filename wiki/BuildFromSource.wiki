@@ -1,0 +1,19 @@
+#summary Building from source
+#labels Phase-Deploy
+
+= Introduction =
+
+  # Download sources archive
+  # You'll need to install the developer tools and libraries for Qt, QtWebkit and Phonone.
+
+== Ubuntu 11.10 ==
+
+  # {{{apt-get install build-essential devscripts fakeroot}}}
+  # {{{apt-get install libqt4-dev libqtwebkit-dev libphonon-dev}}}
+
+== Create package ==
+
+  # Unpack sources: {{{tar -xf qt-webkit-kiosk-<version>.tar.gz}}}
+  # {{{cd qt-webkit-kiosk-<version>}}}
+  # {{{debuild -us -uc}}}
+  # *Done*
