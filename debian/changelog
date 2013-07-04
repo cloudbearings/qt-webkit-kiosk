@@ -1,3 +1,12 @@
+qt-webkit-kiosk (1.04.01ubuntu1) unstable; urgency=low
+
+  * New hot keys - page reload, developer tools
+  * Add sound file for windows (wav)
+  * Add sound event for link click
+  * Put user scripts into bottom of page
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 00:09:17 +0400
+
 qt-webkit-kiosk (1.03.01) unstable; urgency=low
 
   * Fixed build version number
