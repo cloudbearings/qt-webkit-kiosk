@@ -421,6 +421,10 @@ void MainWindow::loadSettings(QString ini_file)
     if (!mainSettings->contains("browser/plugins")) {
         mainSettings->setValue("browser/plugins", true);
     }
+    // Don't break on SSL errors
+    if (!mainSettings->contains("browser/ignore_ssl_errors")) {
+        mainSettings->setValue("browser/ignore_ssl_errors", true);
+    }
 
 
     if (!mainSettings->contains("inspector/enable")) {
