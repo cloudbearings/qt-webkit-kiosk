@@ -3,7 +3,6 @@
 
 #include <QtGui>
 #include <QtWebKit>
-#include <QtWebKitWidgets/QWebView>
 #include <qplayer.h>
 #include <fakewebview.h>
 
@@ -12,11 +11,12 @@ class WebView : public QWebView
     Q_OBJECT
 
 public:
-    explicit WebView(QWidget* parent = 0);
+    WebView(QWidget* parent = 0);
 
     void setSettings(QSettings *settings);
 
     QWebView *createWindow(QWebPage::WebWindowType type);
+
 protected slots:
     void linkClicked(const QUrl &);
     void urlChanged(const QUrl &);
@@ -24,6 +24,7 @@ protected slots:
 protected:
 
     void mousePressEvent(QMouseEvent *event);
+
     QPlayer *getPlayer();
     void playSound(QString soundSetting);
 

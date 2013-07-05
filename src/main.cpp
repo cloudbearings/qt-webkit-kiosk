@@ -39,19 +39,13 @@
 **
 ****************************************************************************/
 
+#include <QtGui>
 #include "mainwindow.h"
-#include <QApplication>
-#include <QWebSettings>
 
 int main(int argc, char * argv[])
 {
     QApplication app(argc, argv);
     MainWindow browser;
-    browser.show();
-
-    int retVal = app.exec();
-
-    QWebSettings::clearMemoryCaches();
-
-    return retVal;
+    //browser.show();
+    return app.exec();
 }

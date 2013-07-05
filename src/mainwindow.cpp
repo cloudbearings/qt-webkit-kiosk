@@ -46,12 +46,8 @@
 #include <QtWebKit>
 #include <QDebug>
 #include "mainwindow.h"
-#include <QStandardPaths>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QtWebKitWidgets/QWebFrame>
 
-MainWindow::MainWindow() : QMainWindow()
+MainWindow::MainWindow()
 {
     progress = 0;
 
@@ -76,7 +72,7 @@ MainWindow::MainWindow() : QMainWindow()
 
     cmdopts->setVersion(VERSION);
 
-    cmdopts->processCommandArgs( QCoreApplication::arguments().length(), QCoreApplication::arguments() );
+    cmdopts->processCommandArgs( QCoreApplication::argc(), QCoreApplication::argv() );
 
     if (cmdopts->getFlag('h') || cmdopts->getFlag("help")) {
         qDebug() << ">> Help option in command prompt...";
@@ -147,7 +143,7 @@ MainWindow::MainWindow() : QMainWindow()
     }
 
     if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
-        printer = new QPrinter();
+        printer = new QPrinter(QPrinter::ScreenResolution);
         printer->setPrinterName(mainSettings->value("printing/printer").toString());
         printer->setPageMargins(
             mainSettings->value("printing/page_margin_left").toReal(),
@@ -161,8 +157,6 @@ MainWindow::MainWindow() : QMainWindow()
     // --- Web View --- //
 
     view = new WebView(this);
-    view->setAttribute(Qt::WA_DeleteOnClose, true);
-
     view->setSettings(mainSettings);
     view->setPage(new QWebPage(view));
 
@@ -185,6 +179,7 @@ MainWindow::MainWindow() : QMainWindow()
     view->settings()->setAttribute(QWebSettings::JavaEnabled,
         mainSettings->value("browser/java").toBool()
     );
+
     view->settings()->setAttribute(QWebSettings::PluginsEnabled,
         mainSettings->value("browser/plugins").toBool()
     );
@@ -205,7 +200,7 @@ MainWindow::MainWindow() : QMainWindow()
         diskCache = new QNetworkDiskCache(this);
         QString location = mainSettings->value("cache/location").toString();
         if (!location.length()) {
-            location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+            location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         }
         diskCache->setCacheDirectory(location);
         diskCache->setMaximumCacheSize(mainSettings->value("cache/size").toUInt());
@@ -214,16 +209,14 @@ MainWindow::MainWindow() : QMainWindow()
     }
 
     connect(view, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
-    connect(view, SIGNAL(loadStarted()), SLOT(startLoading()));
-    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
     connect(view, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
     connect(view, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     connect(view, SIGNAL(iconChanged()), SLOT(pageIconLoaded()));
+    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
 
     connect(view->page(), SIGNAL(printRequested(QWebFrame*)), SLOT(printRequested(QWebFrame*)));
 
-    QDesktopWidget *desktop = QApplication::desktop();
-    connect(desktop, SIGNAL(resized(int)), SLOT(desktopResized(int)));
+    connect(QApplication::desktop(), SIGNAL(resized(int)), SLOT(desktopResized(int)));
 
     show();
 
@@ -264,16 +257,6 @@ MainWindow::MainWindow() : QMainWindow()
             mainSettings->value("browser/homepage").toString()
         ));
     }
-}
-
-WebView *MainWindow::getWebView()
-{
-    return view;
-}
-
-void MainWindow::setWebView(WebView *wv)
-{
-    view = wv;
 }
 
 
@@ -438,10 +421,6 @@ void MainWindow::loadSettings(QString ini_file)
     if (!mainSettings->contains("browser/plugins")) {
         mainSettings->setValue("browser/plugins", true);
     }
-    // Don't break on SSL errors
-    if (!mainSettings->contains("browser/ignore_ssl_errors")) {
-        mainSettings->setValue("browser/ignore_ssl_errors", true);
-    }
 
 
     if (!mainSettings->contains("inspector/enable")) {
@@ -466,7 +445,7 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/enable", false);
     }
     if (!mainSettings->contains("cache/location")) {
-        QString location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+        QString location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         QDir d = QDir(location);
         location += d.separator();
         location += mainSettings->value("application/name").toString();
@@ -533,21 +512,6 @@ void MainWindow::desktopResized(int p)
     }
 }
 
-void MainWindow::startLoading()
-{
-    progress = 0;
-    adjustTitle();
-
-    QWebSettings::clearMemoryCaches();
-
-    qDebug() << "Start loading page: " << view->url().toString();
-}
-
-void MainWindow::urlChanged(const QUrl &url)
-{
-    qDebug() << "URL changes: " << url.toString();
-}
-
 void MainWindow::finishLoading(bool)
 {
     progress = 100;
@@ -555,6 +519,11 @@ void MainWindow::finishLoading(bool)
 
     attachStyles();
     attachJavascripts();
+}
+
+void MainWindow::urlChanged(const QUrl &url)
+{
+    qDebug() << "URL changes: " << url.toString();
 }
 
 void MainWindow::attachJavascripts()
