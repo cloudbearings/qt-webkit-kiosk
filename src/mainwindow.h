@@ -52,7 +52,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 
+    void clearCache();
+    void clearCacheOnExit();
+
 protected slots:
+
+    void cleanupSlot();
 
     void adjustTitle();
     void setProgress(int p);
