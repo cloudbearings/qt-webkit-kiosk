@@ -46,6 +46,7 @@
 #include <QtWebKit>
 #include <QDebug>
 #include "mainwindow.h"
+#include "cachingnm.h"
 
 MainWindow::MainWindow()
 {
@@ -62,10 +63,12 @@ MainWindow::MainWindow()
     cmdopts->addUsage(" --version -V                    Print version and exit");
     cmdopts->addUsage(" --config options.ini            Configuration INI-file");
     cmdopts->addUsage(" --uri http://www.example.com/   Open this URI");
+    cmdopts->addUsage(" --clear-cache -C                Clear cached request data");
     cmdopts->addUsage("");
 
     cmdopts->setFlag("help", 'h');
     cmdopts->setFlag("version", 'V');
+    cmdopts->setFlag("clear-cache", 'C');
 
     cmdopts->setOption("config");
     cmdopts->setOption("uri");
@@ -160,6 +163,28 @@ MainWindow::MainWindow()
     view->setSettings(mainSettings);
     view->setPage(new QWebPage(view));
 
+    // --- Disk cache --- //
+    if (mainSettings->value("cache/enable").toBool()) {
+        diskCache = new QNetworkDiskCache(this);
+        QString location = mainSettings->value("cache/location").toString();
+        if (!location.length()) {
+            location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
+        }
+        diskCache->setCacheDirectory(location);
+        diskCache->setMaximumCacheSize(mainSettings->value("cache/size").toUInt());
+
+        if (mainSettings->value("cache/clear-on-start").toBool()) {
+            diskCache->clear();
+        }
+        if (cmdopts->getFlag('C') || cmdopts->getFlag("clear-cache")) {
+            diskCache->clear();
+        }
+
+        CachingNetworkManager *nm = new CachingNetworkManager();
+        nm->setCache(diskCache);
+        view->page()->setNetworkAccessManager(nm);
+    }
+
     view->settings()->setAttribute(QWebSettings::JavascriptEnabled,
         mainSettings->value("browser/javascript").toBool()
     );
@@ -193,19 +218,6 @@ MainWindow::MainWindow()
         inspector->setWindowTitle(mainSettings->value("application/name").toString() + " - WebInspector");
         inspector->setWindowIcon(this->windowIcon());
         inspector->setPage(view->page());
-    }
-
-    // --- Disk cache --- //
-    if (mainSettings->value("cache/enable").toBool()) {
-        diskCache = new QNetworkDiskCache(this);
-        QString location = mainSettings->value("cache/location").toString();
-        if (!location.length()) {
-            location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
-        }
-        diskCache->setCacheDirectory(location);
-        diskCache->setMaximumCacheSize(mainSettings->value("cache/size").toUInt());
-
-        view->page()->networkAccessManager()->setCache(diskCache);
     }
 
     connect(view, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
@@ -289,6 +301,30 @@ void MainWindow::centerFixedSizeWindow()
 }
 
 
+void MainWindow::clearCache()
+{
+    if (mainSettings->value("cache/enable").toBool()) {
+        diskCache->clear();
+    }
+}
+
+void MainWindow::clearCacheOnExit()
+{
+    if (mainSettings->value("cache/enable").toBool()) {
+        if (mainSettings->value("cache/clear-on-exit").toBool()) {
+            diskCache->clear();
+        }
+    }
+}
+
+void MainWindow::cleanupSlot()
+{
+    qDebug() << "Cleanup Slot (application exit)";
+    clearCacheOnExit();
+    QWebSettings::clearMemoryCaches();
+}
+
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
@@ -299,7 +335,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_R:
         if (int(event->modifiers()) == Qt::CTRL) {
-            diskCache->clear();
+            clearCache();
             view->reload();
         }
         break;
@@ -457,7 +493,13 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/location", d.absolutePath());
     }
     if (!mainSettings->contains("cache/size")) {
-        mainSettings->setValue("cache/size", 50*1024*1024);
+        mainSettings->setValue("cache/size", 100*1024*1024);
+    }
+    if (!mainSettings->contains("cache/clear-on-start")) {
+        mainSettings->setValue("cache/clear-on-start", false);
+    }
+    if (!mainSettings->contains("cache/clear-on-exit")) {
+        mainSettings->setValue("cache/clear-on-exit", false);
     }
 
     if (!mainSettings->contains("printing/show-printer-dialog")) {
@@ -506,7 +548,7 @@ void MainWindow::setProgress(int p)
 
 void MainWindow::desktopResized(int p)
 {
-    qDebug() << "Desktop resized event: p=" << p;
+    qDebug() << "Desktop resized event: " << p;
     if (mainSettings->value("view/fullscreen").toBool()) {
         showFullScreen();
     } else if (mainSettings->value("view/maximized").toBool()) {
