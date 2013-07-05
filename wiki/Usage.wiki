@@ -1,0 +1,14 @@
+#summary usage
+#labels Phase-Support
+
+= Commandline usage for qt-webkit-kiosk =
+
+{{{
+Usage: 
+
+ --help -h                       Print usage and exit
+ --version -V                    Print version and exit
+ --config options.ini            Configuration INI-file
+ --uri http://www.example.com/   Open this URI
+ --clear-cache -C                Clear cached request data
+}}}
