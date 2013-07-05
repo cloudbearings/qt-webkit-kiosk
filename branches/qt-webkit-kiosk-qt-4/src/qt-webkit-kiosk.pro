@@ -10,7 +10,7 @@ QT       += core gui network webkit phonon
 CONFIG += console
 TARGET = qt-webkit-kiosk
 TEMPLATE = app
-VERSION = 1.04.01
+VERSION = 1.04.02
 
 message(Qt version: $$[QT_VERSION])
 message(Qt is installed in $$[QT_INSTALL_PREFIX])
@@ -35,12 +35,16 @@ win32 {
 SOURCES += main.cpp\
     mainwindow.cpp \
     webview.cpp \
-    anyoption.cpp
+    anyoption.cpp \
+    qplayer.cpp \
+    fakewebview.cpp
 
 HEADERS  += mainwindow.h \
     webview.h \
     anyoption.h \
-    config.h
+    config.h \
+    qplayer.h \
+    fakewebview.h
 
 OTHER_FILES += \
     qt-webkit-kiosk.ini \

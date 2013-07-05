@@ -4,16 +4,52 @@
 #include <QtWebKit>
 #include "webview.h"
 
-WebView::WebView(QWidget* parent)
+WebView::WebView(QWidget* parent) : QWebView(parent)
 {
-    audioOutput = new Phonon::AudioOutput(Phonon::MusicCategory, this);
-    mediaObject = new Phonon::MediaObject(this);
+    player = NULL;
 
-    mediaObject->setTickInterval(1000);
+    loader = NULL;
 
-    Phonon::createPath(mediaObject, audioOutput);
+    connect(page()->networkAccessManager(),
+            SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
+            this,
+            SLOT(handleSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
-    this->setParent(parent);
+    connect(page(), SIGNAL(linkClicked(QUrl)), SLOT(linkClicked(const QUrl &)));
+}
+
+void WebView::handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors)
+{
+    qDebug() << "handleSslErrors: ";
+    foreach (QSslError e, errors)
+    {
+        qDebug() << "ssl error: " << e;
+    }
+
+    if (mainSettings->value("browser/ignore_ssl_errors").toBool()) {
+        reply->ignoreSslErrors();
+    } else {
+        reply->abort();
+    }
+}
+
+QPlayer *WebView::getPlayer()
+{
+    if (mainSettings->value("event-sounds/enable").toBool()) {
+        if (player == NULL) {
+            player = new QPlayer();
+        }
+    }
+    return player;
+}
+
+void WebView::playSound(QString soundSetting)
+{
+    if (getPlayer() != NULL) {
+        QString sound = mainSettings->value(soundSetting).toString();
+        qDebug() << "Play sound: " << sound;
+        getPlayer()->play(sound);
+    }
 }
 
 void WebView::setSettings(QSettings *settings)
@@ -25,39 +61,41 @@ void WebView::mousePressEvent(QMouseEvent *event)
 {
     QWebView::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
-        this->setFocus();
-        if (mainSettings->value("event-sounds/enable").toBool()) {
-            QString sound = mainSettings->value("event-sounds/window-clicked").toString();
-            qDebug() << "Window Clicked! Play sound: " << sound;
-            if (sound.length()) {
-
-                mediaObject->stop();
-                mediaObject->clearQueue();
-
-                Phonon::MediaSource source(sound);
-
-                mediaObject->setCurrentSource(source);
-                mediaObject->play();
-            }
-        }
+        qDebug() << "Window Clicked!";
+        playSound("event-sounds/window-clicked");
     }
 }
 
 void WebView::linkClicked(const QUrl &url)
 {
-    QWebView::linkClicked(url);
-    if (mainSettings->value("event-sounds/enable").toBool()) {
-        QString sound = mainSettings->value("event-sounds/link-clicked").toString();
-        qDebug() << "Link Clicked! Play sound: " << sound;
-        if (sound.length()) {
+    qDebug() << "Link Clicked!" << url.toString();
+    playSound("event-sounds/link-clicked");
+}
 
-            mediaObject->stop();
-            mediaObject->clearQueue();
+void WebView::urlChanged(const QUrl &url)
+{
+    qDebug() << "url Changed!" << url.toString();
 
-            Phonon::MediaSource source(sound);
+    this->load(url);
+    qDebug() << "-- load url";
 
-            mediaObject->setCurrentSource(source);
-            mediaObject->play();
-        }
+    loader->close();
+    loader = NULL;
+    qDebug() << "-- close";
+}
+
+QWebView *WebView::createWindow(QWebPage::WebWindowType type)
+{
+    Q_UNUSED(type);
+
+    if (loader == NULL) {
+        loader = new FakeWebView(this);
+        QWebPage *newWeb = new QWebPage(loader);
+        loader->setAttribute(Qt::WA_DeleteOnClose, true);
+        loader->setPage(newWeb);
+
+        connect(loader, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
     }
+
+    return loader;
 }
