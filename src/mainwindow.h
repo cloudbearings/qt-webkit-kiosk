@@ -40,11 +40,8 @@
 ****************************************************************************/
 
 #include <QtGui>
-#include <QMainWindow>
 #include <QtNetwork>
 #include <QtWebKit>
-#include <QtPrintSupport/QPrinter>
-#include <QtWebKitWidgets/QWebInspector>
 #include "webview.h"
 #include "anyoption.h"
 
@@ -53,7 +50,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow();
+    MainWindow();
 
     void clearCache();
     void clearCacheOnExit();
@@ -64,10 +61,9 @@ protected slots:
 
     void adjustTitle();
     void setProgress(int p);
-    void startLoading();
-    void urlChanged(const QUrl &);
     void finishLoading(bool);
     void pageIconLoaded();
+    void urlChanged(const QUrl &);
 
     void printRequested(QWebFrame *wf);
 
@@ -83,6 +79,7 @@ protected:
 private:
     WebView *view;
     QPrinter *printer;
+    QSound *player;
     QSettings *mainSettings;
     QNetworkDiskCache *diskCache;
     QWebInspector *inspector;

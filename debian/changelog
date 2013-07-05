@@ -1,34 +1,21 @@
-qt-webkit-kiosk (1.05.04ubuntu1) unstable; urgency=low
+qt-webkit-kiosk (1.04.03ubuntu1) unstable; urgency=low
 
-  * Version 1.05.04:
+  * Merge changes from 1.05.04:
   * Handle SIGTERM signals
   * Cache cleanup on start or exit
   * New commandline option -C
   * Fix cache use - tune request objects
 
- -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sat, 06 Jul 2013 00:09:43 +0400
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sat, 06 Jul 2013 00:37:36 +0400
 
-qt-webkit-kiosk (1.05.03ubuntu1) unstable; urgency=low
+qt-webkit-kiosk (1.04.02ubuntu1) unstable; urgency=low
 
-  * Version 1.05.03
-  * Use fake webview to catch new window URL
-  * Disable console output
+  * Merge changes from 1.05:
+  * Handle new window links
+  * Separate sounds player class
+  * Handle SSL errors
 
- -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 12:12:17 +0400
-
-qt-webkit-kiosk (1.05.02ubuntu1) unstable; urgency=low
-
-  * Version 1.05.02
-  * Add support of opening links from new windows into main
-  * Add support of ignoring SSL errors
-
- -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 06:18:22 +0400
-
-qt-webkit-kiosk (1.05.01ubuntu1) unstable; urgency=low
-
-  * Version 1.05.01
-
- -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 00:53:17 +0400
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 21:59:17 +0400
 
 qt-webkit-kiosk (1.04.01ubuntu1) unstable; urgency=low
 
