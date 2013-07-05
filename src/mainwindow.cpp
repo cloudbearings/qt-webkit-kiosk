@@ -51,6 +51,8 @@
 MainWindow::MainWindow()
 {
     progress = 0;
+    diskCache = NULL;
+    mainSettings = NULL;
 
     cmdopts = new AnyOption();
     //cmdopts->setVerbose();
@@ -77,6 +79,13 @@ MainWindow::MainWindow()
 
     cmdopts->processCommandArgs( QCoreApplication::argc(), QCoreApplication::argv() );
 
+    if (cmdopts->getValue("config")) {
+        qDebug() << ">> Config option in command prompt...";
+        loadSettings(QString(cmdopts->getValue("config")));
+    } else {
+        loadSettings(QString(""));
+    }
+
     if (cmdopts->getFlag('h') || cmdopts->getFlag("help")) {
         qDebug() << ">> Help option in command prompt...";
         cmdopts->printUsage();
@@ -93,15 +102,7 @@ MainWindow::MainWindow()
         return;
     }
 
-    if (cmdopts->getValue("config")) {
-        qDebug() << ">> Config option in command prompt...";
-        loadSettings(QString(cmdopts->getValue("config")));
-    } else {
-        loadSettings(QString(""));
-    }
-
     qDebug() << "Application icon: " << mainSettings->value("application/icon").toString();
-
     setWindowIcon(QIcon(
        mainSettings->value("application/icon").toString()
     ));
@@ -145,16 +146,18 @@ MainWindow::MainWindow()
         }
     }
 
-    if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
-        printer = new QPrinter(QPrinter::ScreenResolution);
-        printer->setPrinterName(mainSettings->value("printing/printer").toString());
-        printer->setPageMargins(
-            mainSettings->value("printing/page_margin_left").toReal(),
-            mainSettings->value("printing/page_margin_top").toReal(),
-            mainSettings->value("printing/page_margin_right").toReal(),
-            mainSettings->value("printing/page_margin_bottom").toReal(),
-            QPrinter::Millimeter
-        );
+    if (mainSettings->value("printing/enable").toBool()) {
+        if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
+            printer = new QPrinter(QPrinter::ScreenResolution);
+            printer->setPrinterName(mainSettings->value("printing/printer").toString());
+            printer->setPageMargins(
+                mainSettings->value("printing/page_margin_left").toReal(),
+                mainSettings->value("printing/page_margin_top").toReal(),
+                mainSettings->value("printing/page_margin_right").toReal(),
+                mainSettings->value("printing/page_margin_bottom").toReal(),
+                QPrinter::Millimeter
+            );
+        }
     }
 
     // --- Web View --- //
@@ -304,7 +307,9 @@ void MainWindow::centerFixedSizeWindow()
 void MainWindow::clearCache()
 {
     if (mainSettings->value("cache/enable").toBool()) {
-        diskCache->clear();
+        if (diskCache) {
+            diskCache->clear();
+        }
     }
 }
 
@@ -312,7 +317,9 @@ void MainWindow::clearCacheOnExit()
 {
     if (mainSettings->value("cache/enable").toBool()) {
         if (mainSettings->value("cache/clear-on-exit").toBool()) {
-            diskCache->clear();
+            if (diskCache) {
+                diskCache->clear();
+            }
         }
     }
 }
@@ -493,7 +500,7 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/location", d.absolutePath());
     }
     if (!mainSettings->contains("cache/size")) {
-        mainSettings->setValue("cache/size", 100*1024*1024);
+        mainSettings->setValue("cache/size", 100*1000*1000);
     }
     if (!mainSettings->contains("cache/clear-on-start")) {
         mainSettings->setValue("cache/clear-on-start", false);
@@ -502,6 +509,9 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/clear-on-exit", false);
     }
 
+    if (!mainSettings->contains("printing/enable")) {
+        mainSettings->setValue("printing/enable", false);
+    }
     if (!mainSettings->contains("printing/show-printer-dialog")) {
         mainSettings->setValue("printing/show-printer-dialog", false);
     }
@@ -664,9 +674,11 @@ void MainWindow::pageIconLoaded()
 
 void MainWindow::printRequested(QWebFrame *wf)
 {
-    if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
-        if (printer->printerState() != QPrinter::Error) {
-            wf->print(printer);
+    if (mainSettings->value("printing/enable").toBool()) {
+        if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
+            if (printer->printerState() != QPrinter::Error) {
+                wf->print(printer);
+            }
         }
     }
 }
