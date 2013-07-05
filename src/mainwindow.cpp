@@ -158,19 +158,34 @@ MainWindow::MainWindow()
 
     view = new WebView(this);
     view->setSettings(mainSettings);
+    view->setPage(new QWebPage(view));
 
-    view->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,
+    view->settings()->setAttribute(QWebSettings::JavascriptEnabled,
         mainSettings->value("browser/javascript").toBool()
     );
-    view->page()->settings()->setAttribute(QWebSettings::JavaEnabled,
+
+    view->settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows,
+        mainSettings->value("browser/javascript_can_open_windows").toBool()
+    );
+
+    view->settings()->setAttribute(QWebSettings::JavascriptCanCloseWindows,
+        mainSettings->value("browser/javascript_can_close_windows").toBool()
+    );
+
+    view->settings()->setAttribute(QWebSettings::WebGLEnabled,
+        mainSettings->value("browser/webgl").toBool()
+    );
+
+    view->settings()->setAttribute(QWebSettings::JavaEnabled,
         mainSettings->value("browser/java").toBool()
     );
-    view->page()->settings()->setAttribute(QWebSettings::PluginsEnabled,
+
+    view->settings()->setAttribute(QWebSettings::PluginsEnabled,
         mainSettings->value("browser/plugins").toBool()
     );
 
     if (mainSettings->value("inspector/enable").toBool()) {
-        view->page()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+        view->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
         inspector = new QWebInspector();
         inspector->setVisible(mainSettings->value("inspector/visible").toBool());
@@ -197,6 +212,7 @@ MainWindow::MainWindow()
     connect(view, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
     connect(view, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     connect(view, SIGNAL(iconChanged()), SLOT(pageIconLoaded()));
+    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
 
     connect(view->page(), SIGNAL(printRequested(QWebFrame*)), SLOT(printRequested(QWebFrame*)));
 
@@ -390,6 +406,15 @@ void MainWindow::loadSettings(QString ini_file)
     if (!mainSettings->contains("browser/javascript")) {
         mainSettings->setValue("browser/javascript", true);
     }
+    if (!mainSettings->contains("browser/javascript_can_open_windows")) {
+        mainSettings->setValue("browser/javascript_can_open_windows", false);
+    }
+    if (!mainSettings->contains("browser/javascript_can_close_windows")) {
+        mainSettings->setValue("browser/javascript_can_close_windows", false);
+    }
+    if (!mainSettings->contains("browser/webgl")) {
+        mainSettings->setValue("browser/webgl", false);
+    }
     if (!mainSettings->contains("browser/java")) {
         mainSettings->setValue("browser/java", false);
     }
@@ -494,6 +519,11 @@ void MainWindow::finishLoading(bool)
 
     attachStyles();
     attachJavascripts();
+}
+
+void MainWindow::urlChanged(const QUrl &url)
+{
+    qDebug() << "URL changes: " << url.toString();
 }
 
 void MainWindow::attachJavascripts()

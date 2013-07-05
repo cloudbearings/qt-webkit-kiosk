@@ -3,9 +3,8 @@
 
 #include <QtGui>
 #include <QtWebKit>
-#include <phonon/audiooutput.h>
-#include <phonon/mediaobject.h>
-#include <phonon/backendcapabilities.h>
+#include <qplayer.h>
+#include <fakewebview.h>
 
 class WebView : public QWebView
 {
@@ -16,15 +15,26 @@ public:
 
     void setSettings(QSettings *settings);
 
+    QWebView *createWindow(QWebPage::WebWindowType type);
+
+protected slots:
+    void linkClicked(const QUrl &);
+    void urlChanged(const QUrl &);
+
 protected:
 
     void mousePressEvent(QMouseEvent *event);
-    void linkClicked(const QUrl &);
+
+    QPlayer *getPlayer();
+    void playSound(QString soundSetting);
+
+private slots:
+    void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
 
 private:
-    Phonon::MediaObject *mediaObject;
-    Phonon::AudioOutput *audioOutput;
+    QPlayer *player;
     QSettings *mainSettings;
+    FakeWebView *loader;
 };
 
 #endif // WEBVIEW_H

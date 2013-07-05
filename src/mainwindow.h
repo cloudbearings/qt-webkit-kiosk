@@ -58,6 +58,7 @@ protected slots:
     void setProgress(int p);
     void finishLoading(bool);
     void pageIconLoaded();
+    void urlChanged(const QUrl &);
 
     void printRequested(QWebFrame *wf);
 
