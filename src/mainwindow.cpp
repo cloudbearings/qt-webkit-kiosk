@@ -46,15 +46,13 @@
 #include <QtWebKit>
 #include <QDebug>
 #include "mainwindow.h"
-#include <QStandardPaths>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QtWebKitWidgets/QWebFrame>
-#include <cachingnm.h>
+#include "cachingnm.h"
 
-MainWindow::MainWindow() : QMainWindow()
+MainWindow::MainWindow()
 {
     progress = 0;
+    diskCache = NULL;
+    mainSettings = NULL;
 
     cmdopts = new AnyOption();
     //cmdopts->setVerbose();
@@ -79,7 +77,14 @@ MainWindow::MainWindow() : QMainWindow()
 
     cmdopts->setVersion(VERSION);
 
-    cmdopts->processCommandArgs( QCoreApplication::arguments().length(), QCoreApplication::arguments() );
+    cmdopts->processCommandArgs( QCoreApplication::argc(), QCoreApplication::argv() );
+
+    if (cmdopts->getValue("config")) {
+        qDebug() << ">> Config option in command prompt...";
+        loadSettings(QString(cmdopts->getValue("config")));
+    } else {
+        loadSettings(QString(""));
+    }
 
     if (cmdopts->getFlag('h') || cmdopts->getFlag("help")) {
         qDebug() << ">> Help option in command prompt...";
@@ -97,15 +102,7 @@ MainWindow::MainWindow() : QMainWindow()
         return;
     }
 
-    if (cmdopts->getValue("config")) {
-        qDebug() << ">> Config option in command prompt...";
-        loadSettings(QString(cmdopts->getValue("config")));
-    } else {
-        loadSettings(QString(""));
-    }
-
     qDebug() << "Application icon: " << mainSettings->value("application/icon").toString();
-
     setWindowIcon(QIcon(
        mainSettings->value("application/icon").toString()
     ));
@@ -149,16 +146,18 @@ MainWindow::MainWindow() : QMainWindow()
         }
     }
 
-    if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
-        printer = new QPrinter();
-        printer->setPrinterName(mainSettings->value("printing/printer").toString());
-        printer->setPageMargins(
-            mainSettings->value("printing/page_margin_left").toReal(),
-            mainSettings->value("printing/page_margin_top").toReal(),
-            mainSettings->value("printing/page_margin_right").toReal(),
-            mainSettings->value("printing/page_margin_bottom").toReal(),
-            QPrinter::Millimeter
-        );
+    if (mainSettings->value("printing/enable").toBool()) {
+        if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
+            printer = new QPrinter(QPrinter::ScreenResolution);
+            printer->setPrinterName(mainSettings->value("printing/printer").toString());
+            printer->setPageMargins(
+                mainSettings->value("printing/page_margin_left").toReal(),
+                mainSettings->value("printing/page_margin_top").toReal(),
+                mainSettings->value("printing/page_margin_right").toReal(),
+                mainSettings->value("printing/page_margin_bottom").toReal(),
+                QPrinter::Millimeter
+            );
+        }
     }
 
     // --- Web View --- //
@@ -172,7 +171,7 @@ MainWindow::MainWindow() : QMainWindow()
         diskCache = new QNetworkDiskCache(this);
         QString location = mainSettings->value("cache/location").toString();
         if (!location.length()) {
-            location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+            location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         }
         diskCache->setCacheDirectory(location);
         diskCache->setMaximumCacheSize(mainSettings->value("cache/size").toUInt());
@@ -208,6 +207,7 @@ MainWindow::MainWindow() : QMainWindow()
     view->settings()->setAttribute(QWebSettings::JavaEnabled,
         mainSettings->value("browser/java").toBool()
     );
+
     view->settings()->setAttribute(QWebSettings::PluginsEnabled,
         mainSettings->value("browser/plugins").toBool()
     );
@@ -224,16 +224,14 @@ MainWindow::MainWindow() : QMainWindow()
     }
 
     connect(view, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
-    connect(view, SIGNAL(loadStarted()), SLOT(startLoading()));
-    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
     connect(view, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
     connect(view, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     connect(view, SIGNAL(iconChanged()), SLOT(pageIconLoaded()));
+    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
 
     connect(view->page(), SIGNAL(printRequested(QWebFrame*)), SLOT(printRequested(QWebFrame*)));
 
-    QDesktopWidget *desktop = QApplication::desktop();
-    connect(desktop, SIGNAL(resized(int)), SLOT(desktopResized(int)));
+    connect(QApplication::desktop(), SIGNAL(resized(int)), SLOT(desktopResized(int)));
 
     show();
 
@@ -276,29 +274,6 @@ MainWindow::MainWindow() : QMainWindow()
     }
 }
 
-void MainWindow::clearCache()
-{
-    if (mainSettings->value("cache/enable").toBool()) {
-        diskCache->clear();
-    }
-}
-
-void MainWindow::clearCacheOnExit()
-{
-    if (mainSettings->value("cache/enable").toBool()) {
-        if (mainSettings->value("cache/clear-on-exit").toBool()) {
-            diskCache->clear();
-        }
-    }
-}
-
-void MainWindow::cleanupSlot()
-{
-    qDebug() << "Cleanup Slot (application exit)";
-    clearCacheOnExit();
-    QWebSettings::clearMemoryCaches();
-}
-
 
 void MainWindow::centerFixedSizeWindow()
 {
@@ -329,12 +304,39 @@ void MainWindow::centerFixedSizeWindow()
 }
 
 
+void MainWindow::clearCache()
+{
+    if (mainSettings->value("cache/enable").toBool()) {
+        if (diskCache) {
+            diskCache->clear();
+        }
+    }
+}
+
+void MainWindow::clearCacheOnExit()
+{
+    if (mainSettings->value("cache/enable").toBool()) {
+        if (mainSettings->value("cache/clear-on-exit").toBool()) {
+            if (diskCache) {
+                diskCache->clear();
+            }
+        }
+    }
+}
+
+void MainWindow::cleanupSlot()
+{
+    qDebug() << "Cleanup Slot (application exit)";
+    clearCacheOnExit();
+    QWebSettings::clearMemoryCaches();
+}
+
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
     case Qt::Key_Q:
         if (int(event->modifiers()) == Qt::CTRL) {
-            clearCacheOnExit();
             QApplication::exit(0);
         }
         break;
@@ -490,7 +492,7 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/enable", false);
     }
     if (!mainSettings->contains("cache/location")) {
-        QString location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+        QString location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         QDir d = QDir(location);
         location += d.separator();
         location += mainSettings->value("application/name").toString();
@@ -498,7 +500,7 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/location", d.absolutePath());
     }
     if (!mainSettings->contains("cache/size")) {
-        mainSettings->setValue("cache/size", 100*1024*1024);
+        mainSettings->setValue("cache/size", 100*1000*1000);
     }
     if (!mainSettings->contains("cache/clear-on-start")) {
         mainSettings->setValue("cache/clear-on-start", false);
@@ -507,6 +509,9 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/clear-on-exit", false);
     }
 
+    if (!mainSettings->contains("printing/enable")) {
+        mainSettings->setValue("printing/enable", false);
+    }
     if (!mainSettings->contains("printing/show-printer-dialog")) {
         mainSettings->setValue("printing/show-printer-dialog", false);
     }
@@ -563,30 +568,18 @@ void MainWindow::desktopResized(int p)
     }
 }
 
-void MainWindow::startLoading()
-{
-    progress = 0;
-    adjustTitle();
-
-    QWebSettings::clearMemoryCaches();
-
-    qDebug() << "Start loading...";
-}
-
-void MainWindow::urlChanged(const QUrl &url)
-{
-    qDebug() << "URL changes: " << url.toString();
-}
-
 void MainWindow::finishLoading(bool)
 {
-    qDebug() << "Finish loading...";
-
     progress = 100;
     adjustTitle();
 
     attachStyles();
     attachJavascripts();
+}
+
+void MainWindow::urlChanged(const QUrl &url)
+{
+    qDebug() << "URL changes: " << url.toString();
 }
 
 void MainWindow::attachJavascripts()
@@ -681,9 +674,11 @@ void MainWindow::pageIconLoaded()
 
 void MainWindow::printRequested(QWebFrame *wf)
 {
-    if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
-        if (printer->printerState() != QPrinter::Error) {
-            wf->print(printer);
+    if (mainSettings->value("printing/enable").toBool()) {
+        if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
+            if (printer->printerState() != QPrinter::Error) {
+                wf->print(printer);
+            }
         }
     }
 }

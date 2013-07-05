@@ -3,16 +3,13 @@
 #include <QtGui>
 #include <QtWebKit>
 #include "webview.h"
-#include <QNetworkReply>
-#include <QtDebug>
-#include <QSslError>
-#include "mainwindow.h"
 
-
-WebView::WebView(QWidget* parent): QWebView(parent)
+WebView::WebView(QWidget* parent) : QWebView(parent)
 {
     player = NULL;
+
     loader = NULL;
+
     connect(page()->networkAccessManager(),
             SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
             this,
@@ -36,9 +33,28 @@ void WebView::handleSslErrors(QNetworkReply* reply, const QList<QSslError> &erro
     }
 }
 
+QPlayer *WebView::getPlayer()
+{
+    if (mainSettings->value("event-sounds/enable").toBool()) {
+        if (player == NULL) {
+            player = new QPlayer();
+        }
+    }
+    return player;
+}
+
+void WebView::playSound(QString soundSetting)
+{
+    if (getPlayer() != NULL) {
+        QString sound = mainSettings->value(soundSetting).toString();
+        qDebug() << "Play sound: " << sound;
+        getPlayer()->play(sound);
+    }
+}
+
 void WebView::setSettings(QSettings *settings)
 {
-    mainSettings = settings;
+    this->mainSettings = settings;
 }
 
 void WebView::mousePressEvent(QMouseEvent *event)
@@ -64,27 +80,8 @@ void WebView::urlChanged(const QUrl &url)
     qDebug() << "-- load url";
 
     loader->close();
-    qDebug() << "-- close";
     loader = NULL;
-}
-
-QPlayer *WebView::getPlayer()
-{
-    if (mainSettings->value("event-sounds/enable").toBool()) {
-        if (player == NULL) {
-            player = new QPlayer();
-        }
-    }
-    return player;
-}
-
-void WebView::playSound(QString soundSetting)
-{
-    if (getPlayer() != NULL) {
-        QString sound = mainSettings->value(soundSetting).toString();
-        qDebug() << "Play sound: " << sound;
-        getPlayer()->play(sound);
-    }
+    qDebug() << "-- close";
 }
 
 QWebView *WebView::createWindow(QWebPage::WebWindowType type)
@@ -92,7 +89,6 @@ QWebView *WebView::createWindow(QWebPage::WebWindowType type)
     Q_UNUSED(type);
 
     if (loader == NULL) {
-        qDebug() << "New fake webview loader";
         loader = new FakeWebView(this);
         QWebPage *newWeb = new QWebPage(loader);
         loader->setAttribute(Qt::WA_DeleteOnClose, true);
