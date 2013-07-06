@@ -3,6 +3,8 @@
 
 = Commandline usage for qt-webkit-kiosk =
 
+For version 1.04.04 , 1.05.05
+
 {{{
 Usage: 
 
@@ -12,3 +14,12 @@ Usage:
  --uri http://www.example.com/   Open this URI
  --clear-cache -C                Clear cached request data
 }}}
+
+= Hot-keys =
+
+|| *Key* || *Action* ||
+|| Ctrl+Q || Close program ||
+|| F5 || Reload page ||
+|| Ctrl+R || Reload page with cache clean ||
+|| F12 || Toggle inspector (developer tools) ||
+|| F11 || Toggle fullscreen mode ||
