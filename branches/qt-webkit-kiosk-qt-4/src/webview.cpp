@@ -7,16 +7,85 @@
 WebView::WebView(QWidget* parent) : QWebView(parent)
 {
     player = NULL;
-
     loader = NULL;
+}
 
+/**
+ * Call after setPage
+ * @brief WebView::initSignals
+ */
+void WebView::initSignals()
+{
     connect(page()->networkAccessManager(),
             SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
             this,
             SLOT(handleSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
-    connect(page(), SIGNAL(linkClicked(QUrl)), SLOT(linkClicked(const QUrl &)));
+    connect(page(),
+            SIGNAL(windowCloseRequested()),
+            this,
+            SLOT(handleWindowCloseRequested()));
+
+    connect(page(),
+            SIGNAL(printRequested(QWebFrame*)),
+            this,
+            SLOT(handlePrintRequested(QWebFrame*)));
 }
+
+void WebView::setPage(QWebPage *page)
+{
+    QWebView::setPage(page);
+    initSignals();
+}
+
+
+void WebView::setSettings(QSettings *settings)
+{
+    this->mainSettings = settings;
+
+    if (mainSettings->value("printing/enable").toBool()) {
+        if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
+            printer = new QPrinter();
+            printer->setPrinterName(mainSettings->value("printing/printer").toString());
+            printer->setPageMargins(
+                mainSettings->value("printing/page_margin_left").toReal(),
+                mainSettings->value("printing/page_margin_top").toReal(),
+                mainSettings->value("printing/page_margin_right").toReal(),
+                mainSettings->value("printing/page_margin_bottom").toReal(),
+                QPrinter::Millimeter
+            );
+        }
+    }
+}
+
+
+void WebView::loadHomepage()
+{
+    QFileInfo finfo = QFileInfo();
+    finfo.setFile(mainSettings->value("browser/homepage").toString());
+
+    qDebug() << "Homepage: like file = " <<
+                mainSettings->value("browser/homepage").toString() <<
+                ", absolute path = " <<
+                finfo.absoluteFilePath() <<
+                ", local uri = " <<
+                QUrl::fromLocalFile(
+                    mainSettings->value("browser/homepage").toString()
+                ).toString();
+
+    if (finfo.isFile()) {
+        qDebug() << "Homepage: Local FILE!";
+        this->load(QUrl::fromLocalFile(
+            finfo.absoluteFilePath()
+        ));
+    } else {
+        qDebug() << "Homepage: Remote URI!";
+        this->load(QUrl(
+            mainSettings->value("browser/homepage").toString()
+        ));
+    }
+}
+
 
 void WebView::handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors)
 {
@@ -33,6 +102,40 @@ void WebView::handleSslErrors(QNetworkReply* reply, const QList<QSslError> &erro
     }
 }
 
+void WebView::handleWindowCloseRequested()
+{
+    qDebug() << "Handle windowCloseRequested:" << mainSettings->value("browser/show_homepage_on_window_close").toString();
+    if (mainSettings->value("browser/show_homepage_on_window_close").toBool()) {
+        qDebug() << "-- load homepage";
+        loadHomepage();
+    } else {
+        qDebug() << "-- exit application";
+        QKeyEvent * eventExit = new QKeyEvent( QEvent::KeyPress, Qt::Key_Q, Qt::ControlModifier, "Exit", 0 );
+        QCoreApplication::postEvent( this, eventExit );
+    }
+}
+
+void WebView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        qDebug() << "Window Clicked!";
+        playSound("event-sounds/window-clicked");
+    }
+    QWebView::mousePressEvent(event);
+}
+
+void WebView::handleUrlChanged(const QUrl &url)
+{
+    qDebug() << "url Changed!" << url.toString();
+
+    this->load(url);
+    qDebug() << "-- load url";
+
+    loader->close();
+    loader = NULL;
+    qDebug() << "-- close";
+}
+
 QPlayer *WebView::getPlayer()
 {
     if (mainSettings->value("event-sounds/enable").toBool()) {
@@ -47,41 +150,15 @@ void WebView::playSound(QString soundSetting)
 {
     if (getPlayer() != NULL) {
         QString sound = mainSettings->value(soundSetting).toString();
-        qDebug() << "Play sound: " << sound;
-        getPlayer()->play(sound);
+        QFileInfo finfo = QFileInfo();
+        finfo.setFile(sound);
+        if (finfo.exists()) {
+            qDebug() << "Play sound: " << sound;
+            getPlayer()->play(sound);
+        } else {
+            qDebug() << "Sound file" << sound << "not found!";
+        }
     }
-}
-
-void WebView::setSettings(QSettings *settings)
-{
-    this->mainSettings = settings;
-}
-
-void WebView::mousePressEvent(QMouseEvent *event)
-{
-    QWebView::mousePressEvent(event);
-    if (event->button() == Qt::LeftButton) {
-        qDebug() << "Window Clicked!";
-        playSound("event-sounds/window-clicked");
-    }
-}
-
-void WebView::linkClicked(const QUrl &url)
-{
-    qDebug() << "Link Clicked!" << url.toString();
-    playSound("event-sounds/link-clicked");
-}
-
-void WebView::urlChanged(const QUrl &url)
-{
-    qDebug() << "url Changed!" << url.toString();
-
-    this->load(url);
-    qDebug() << "-- load url";
-
-    loader->close();
-    loader = NULL;
-    qDebug() << "-- close";
 }
 
 QWebView *WebView::createWindow(QWebPage::WebWindowType type)
@@ -98,4 +175,17 @@ QWebView *WebView::createWindow(QWebPage::WebWindowType type)
     }
 
     return loader;
+}
+
+void WebView::handlePrintRequested(QWebFrame *wf)
+{
+    qDebug() << "Handle printRequested...";
+    if (mainSettings->value("printing/enable").toBool()) {
+        if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
+            if (printer->printerState() != QPrinter::Error) {
+                qDebug() << "... got printer, try use it";
+                wf->print(printer);
+            }
+        }
+    }
 }

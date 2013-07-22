@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QtWebKit>
+#include <QPrinter>
 #include <qplayer.h>
 #include <fakewebview.h>
 
@@ -14,27 +15,32 @@ public:
     WebView(QWidget* parent = 0);
 
     void setSettings(QSettings *settings);
+    void loadHomepage();
+    void initSignals();
+
+    void setPage(QWebPage* page);
 
     QWebView *createWindow(QWebPage::WebWindowType type);
 
-protected slots:
-    void linkClicked(const QUrl &);
-    void urlChanged(const QUrl &);
-
-protected:
-
-    void mousePressEvent(QMouseEvent *event);
-
-    QPlayer *getPlayer();
     void playSound(QString soundSetting);
 
-private slots:
-    void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
+public slots:
+    void handlePrintRequested(QWebFrame *);
+    void handleUrlChanged(const QUrl &);
+
+protected:
+    void mousePressEvent(QMouseEvent *event);
+    QPlayer *getPlayer();
 
 private:
     QPlayer *player;
     QSettings *mainSettings;
     FakeWebView *loader;
+    QPrinter *printer;
+
+private slots:
+    void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
+    void handleWindowCloseRequested();
 };
 
 #endif // WEBVIEW_H
