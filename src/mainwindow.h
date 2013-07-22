@@ -61,11 +61,10 @@ protected slots:
 
     void adjustTitle();
     void setProgress(int p);
+    void startLoading();
+    void urlChanged(const QUrl &);
     void finishLoading(bool);
     void pageIconLoaded();
-    void urlChanged(const QUrl &);
-
-    void printRequested(QWebFrame *wf);
 
     void desktopResized(int p);
 
@@ -78,8 +77,6 @@ protected:
 
 private:
     WebView *view;
-    QPrinter *printer;
-    QSound *player;
     QSettings *mainSettings;
     QNetworkDiskCache *diskCache;
     QWebInspector *inspector;

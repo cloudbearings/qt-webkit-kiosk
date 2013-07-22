@@ -1,3 +1,13 @@
+qt-webkit-kiosk (1.04.05ubuntu1) unstable; urgency=low
+
+  * Version 1.04.05:
+  * Merge changes from 1.05.06-1.05.07:
+  * + Fix handle link click and sound play
+  * + Fix handle window.close()
+  * + New sounds
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Mon, 22 Jul 2013 23:35:00 +0400
+
 qt-webkit-kiosk (1.04.04ubuntu1) unstable; urgency=low
 
   * Version 1.04.04:
