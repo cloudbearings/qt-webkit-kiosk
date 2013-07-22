@@ -46,13 +46,9 @@
 #include <QtWebKit>
 #include <QDebug>
 #include "mainwindow.h"
-#include <QStandardPaths>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QtWebKitWidgets/QWebFrame>
-#include <cachingnm.h>
+#include "cachingnm.h"
 
-MainWindow::MainWindow() : QMainWindow()
+MainWindow::MainWindow()
 {
     progress = 0;
     diskCache = NULL;
@@ -81,7 +77,7 @@ MainWindow::MainWindow() : QMainWindow()
 
     cmdopts->setVersion(VERSION);
 
-    cmdopts->processCommandArgs( QCoreApplication::arguments().length(), QCoreApplication::arguments() );
+    cmdopts->processCommandArgs( QCoreApplication::argc(), QCoreApplication::argv() );
 
     if (cmdopts->getValue("config")) {
         qDebug() << ">> Config option in command prompt...";
@@ -161,7 +157,7 @@ MainWindow::MainWindow() : QMainWindow()
         diskCache = new QNetworkDiskCache(this);
         QString location = mainSettings->value("cache/location").toString();
         if (!location.length()) {
-            location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+            location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         }
         diskCache->setCacheDirectory(location);
         diskCache->setMaximumCacheSize(mainSettings->value("cache/size").toUInt());
@@ -197,6 +193,7 @@ MainWindow::MainWindow() : QMainWindow()
     view->settings()->setAttribute(QWebSettings::JavaEnabled,
         mainSettings->value("browser/java").toBool()
     );
+
     view->settings()->setAttribute(QWebSettings::PluginsEnabled,
         mainSettings->value("browser/plugins").toBool()
     );
@@ -214,13 +211,12 @@ MainWindow::MainWindow() : QMainWindow()
 
     connect(view, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
     connect(view, SIGNAL(loadStarted()), SLOT(startLoading()));
-    connect(view, SIGNAL(urlChanged(const QUrl &)), SLOT(urlChanged(const QUrl &)));
+    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
     connect(view, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
     connect(view, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     connect(view, SIGNAL(iconChanged()), SLOT(pageIconLoaded()));
 
-    QDesktopWidget *desktop = QApplication::desktop();
-    connect(desktop, SIGNAL(resized(int)), SLOT(desktopResized(int)));
+    connect(QApplication::desktop(), SIGNAL(resized(int)), SLOT(desktopResized(int)));
 
     show();
 
@@ -463,7 +459,7 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/enable", false);
     }
     if (!mainSettings->contains("cache/location")) {
-        QString location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+        QString location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         QDir d = QDir(location);
         location += d.separator();
         location += mainSettings->value("application/name").toString();

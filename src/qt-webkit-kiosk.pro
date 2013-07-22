@@ -5,17 +5,12 @@
 #-------------------------------------------------
 
 
-QT       += core gui network webkit multimedia widgets webkitwidgets printsupport
-
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-    message("Cannot build Qt Creator with Qt version $${QT_VERSION}.")
-    error("Use at least Qt 5.0.")
-}
+QT       += core gui network webkit phonon
 
 CONFIG += console
 TARGET = qt-webkit-kiosk
 TEMPLATE = app
-VERSION = 1.05.07
+VERSION = 1.04.05
 
 message(Qt version: $$[QT_VERSION])
 message(Qt is installed in $$[QT_INSTALL_PREFIX])

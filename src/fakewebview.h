@@ -2,7 +2,7 @@
 #define FAKEWEBVIEW_H
 
 #include <QtNetwork>
-#include <QtWebKitWidgets/QWebView>
+#include <QWebView>
 
 class FakeWebView : public QWebView
 {
