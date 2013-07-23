@@ -12,6 +12,7 @@
 [browser]
 ; Full URI or full path to HTML file
 ;homepage=http://www.example.com/
+homepage=default.html
 java=false
 javascript=true
 ; handle window.open?
@@ -20,7 +21,10 @@ javascript_can_open_windows=false
 javascript_can_close_windows=false
 webgl=false
 plugins=true
+; Trust any certificate by default
 ignore_ssl_errors=true
+; Don't close application, show default homepage
+show_homepage_on_window_close=true
 
 
 [inspector]
@@ -40,7 +44,7 @@ enable=false
 ; full-path to sound file
 ; format - supported by Qt
 ;window-clicked=window-clicked.wav
-;link-clicked=window-clicked.wav
+;link-clicked=link-clicked.wav
 
 [cache]
 enable=false
@@ -58,7 +62,7 @@ organization-domain=www.example.com
 ; First part of User-Agent
 name=QtWebkitKiosk
 ; Second part of User-Agent
-version=1.04.04
+version=1.04.06
 ; Appears like %name%/%version%
 
 
