@@ -10,7 +10,7 @@ QT       += core gui network webkit phonon
 CONFIG += console
 TARGET = qt-webkit-kiosk
 TEMPLATE = app
-VERSION = 1.04.05
+VERSION = 1.04.06
 
 message(Qt version: $$[QT_VERSION])
 message(Qt is installed in $$[QT_INSTALL_PREFIX])
@@ -47,18 +47,6 @@ HEADERS  += mainwindow.h \
     qplayer.h \
     fakewebview.h \
     cachingnm.h
-
-OTHER_FILES += \
-    qt-webkit-kiosk.ini \
-    ../debian/rules \
-    ../debian/README \
-    ../debian/docs \
-    ../debian/copyright \
-    ../debian/control \
-    ../debian/compat \
-    ../debian/changelog \
-    ../debian/source/format
-
 
 # INSTALL
 
