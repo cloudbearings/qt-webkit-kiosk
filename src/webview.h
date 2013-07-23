@@ -3,8 +3,7 @@
 
 #include <QtGui>
 #include <QtWebKit>
-#include <QtWebKitWidgets/QWebView>
-#include <QtWebKitWidgets/QWebFrame>
+#include <QPrinter>
 #include <qplayer.h>
 #include <fakewebview.h>
 
@@ -13,7 +12,7 @@ class WebView : public QWebView
     Q_OBJECT
 
 public:
-    explicit WebView(QWidget* parent = 0);
+    WebView(QWidget* parent = 0);
 
     void setSettings(QSettings *settings);
     void loadHomepage();
@@ -42,7 +41,6 @@ private:
 private slots:
     void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
     void handleWindowCloseRequested();
-
 };
 
 #endif // WEBVIEW_H
