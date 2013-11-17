@@ -19,12 +19,13 @@ javascript=true
 javascript_can_open_windows=false
 ; handle window.close ?
 javascript_can_close_windows=false
+; And do not close application, show default homepage
+show_homepage_on_window_close=true
+
 webgl=false
 plugins=true
 ; Trust any certificate by default
 ignore_ssl_errors=true
-; Don't close application, show default homepage
-show_homepage_on_window_close=true
 
 
 [inspector]
