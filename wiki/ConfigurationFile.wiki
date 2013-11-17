@@ -86,12 +86,16 @@ username=username
 password=password
 
 [view]
+; Size mode: only one at time, and checked in this order
 fullscreen=true
 maximized=false
 fixed-size=false
+; If fixed size - define it
 fixed-width=800
 fixed-height=600
+; Place window in center of desktop
 fixed-centered=true
+; If not centered - define default position
 fixed-x=0
 fixed-y=0
 
