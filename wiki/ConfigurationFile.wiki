@@ -68,19 +68,28 @@ version=1.04.06
 
 
 [printing]
+; If enabled - javascript window.print() working!
+; And Ctrl+P
 enable=false
+; Show printing dialog?
 show-printer-dialog=false
+; Well, may be you need 'PDF' name?
 printer=default
+; Some page setup...
 page_margin_left=0
 page_margin_top=0
 page_margin_right=0
 page_margin_bottom=0
 
 [proxy]
+; Use proxy?
 enable=false
+; Use system proxy settings?
 system=true
+; Or not...
 host=proxy.example.com
 port=3128
+; Need authorization?
 auth=false
 username=username
 password=password
