@@ -1,0 +1,115 @@
+qt-webkit-kiosk (1.05.09ubuntu1) unstable; urgency=low
+
+  * Version 1.05.09:
+    + Add startup delay for window resize and page load
+    + Add minimum window size options
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sun, 12 Jan 2014 21:16:00 +0400
+
+qt-webkit-kiosk (1.05.08ubuntu1) unstable; urgency=low
+
+  * Version 1.05.08:
+  * Qt project files clean up and fix
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Thu, 23 Jul 2013 10:46:00 +0400
+
+qt-webkit-kiosk (1.05.07ubuntu1) unstable; urgency=low
+
+  * Version 1.05.07:
+  * + Fix handle link click and sound play
+  * + New sounds
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Mon, 22 Jul 2013 22:57:00 +0400
+
+qt-webkit-kiosk (1.05.06ubuntu1) unstable; urgency=low
+
+  * Version 1.05.06:
+  * + Fix handle link click and sound play
+  * + Fix handle window.close()
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sun, 21 Jul 2013 23:05:00 +0400
+
+qt-webkit-kiosk (1.05.05ubuntu1) unstable; urgency=low
+
+  * Version 1.05.05:
+  * Merged changes from 1.04.04
+  * + Fix segfault on exit
+  * + Disable printing by default
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sat, 06 Jul 2013 03:31:42 +0400
+
+qt-webkit-kiosk (1.05.04ubuntu1) unstable; urgency=low
+
+  * Version 1.05.04:
+  * Handle SIGTERM signals
+  * Cache cleanup on start or exit
+  * New commandline option -C
+  * Fix cache use - tune request objects
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sat, 06 Jul 2013 00:09:43 +0400
+
+qt-webkit-kiosk (1.05.03ubuntu1) unstable; urgency=low
+
+  * Version 1.05.03
+  * Use fake webview to catch new window URL
+  * Disable console output
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 12:12:17 +0400
+
+qt-webkit-kiosk (1.05.02ubuntu1) unstable; urgency=low
+
+  * Version 1.05.02
+  * Add support of opening links from new windows into main
+  * Add support of ignoring SSL errors
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 06:18:22 +0400
+
+qt-webkit-kiosk (1.05.01ubuntu1) unstable; urgency=low
+
+  * Version 1.05.01
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 00:53:17 +0400
+
+qt-webkit-kiosk (1.04.01ubuntu1) unstable; urgency=low
+
+  * New hot keys - page reload, developer tools
+  * Add sound file for windows (wav)
+  * Add sound event for link click
+  * Put user scripts into bottom of page
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Fri, 05 Jul 2013 00:09:17 +0400
+
+qt-webkit-kiosk (1.03.01) unstable; urgency=low
+
+  * Fixed build version number
+  * Skip empty scripts and styles attach lists
+  * User config stored in user home directory: ~/.config/QtWebkitKiosk/config.ini
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Thu, 19 Apr 2012 23:03:00 +0400
+
+qt-webkit-kiosk (1.03.00) unstable; urgency=low
+
+  * Remove debug output in release build
+  * Attach user scripts and styles when page loaded
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Thu, 19 Apr 2012 00:36:00 +0400
+
+qt-webkit-kiosk (1.02.01) unstable; urgency=low
+
+  * Fixed startup issue with only one command prompt parameter defined.
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Thu, 18 Apr 2012 22:10:00 +0400
+
+qt-webkit-kiosk (1.02.00) unstable; urgency=low
+
+  * Fixed startup issue with only one command prompt parameter defined.
+  * Fixed issue with window size and position when screen resolution changed.
+  * Fixed build issues on older than Ununtu 11.10 systems.
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Thu, 17 Apr 2012 23:28:00 +0400
+
+qt-webkit-kiosk (1.01.00) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Mon, 12 Dec 2011 02:36:28 +0400
