@@ -71,7 +71,7 @@ clean-on-exit=false
 organization=Organization
 organization-domain=www.example.com
 name=QtWebkitKiosk
-version=1.05.10
+version=1.05.12
 
 [printing]
 enable=false
