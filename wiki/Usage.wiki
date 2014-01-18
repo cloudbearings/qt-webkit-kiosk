@@ -23,3 +23,10 @@ Usage:
 || Ctrl+R || Reload page with cache clean ||
 || F12 || Toggle inspector (developer tools) ||
 || F11 || Toggle fullscreen mode ||
+|| Up || Scroll up ||
+|| Down || Scroll down ||
+|| PageUp || Scroll page up ||
+|| PageDown || Scroll page down ||
+|| Home || Scroll to page top ||
+|| End || Scroll to page bottom ||
+|| Ctrl+Home, HomePage || Load home (startup) page ||
