@@ -1,3 +1,12 @@
+qt-webkit-kiosk (1.04.08sergey1) unstable; urgency=low
+
+  * Version 1.04.08:
+  * Merge changes from 1.05.12:
+    - Fix styles and scripts inserting into page after it's loaded
+    - Add option to disable text selection
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sat, 18 Jan 2014 22:11:00 +0400
+
 qt-webkit-kiosk (1.04.07ubuntu1) unstable; urgency=low
 
   * Version 1.04.07:
