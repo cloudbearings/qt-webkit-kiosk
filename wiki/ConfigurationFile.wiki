@@ -1,5 +1,5 @@
-#summary configuration.
-#labels Phase-Support
+#summary configuration file.
+#labels Phase-Support,Featured
 
 = Location =
 
@@ -13,20 +13,27 @@
 ; Full URI or full path to HTML file
 ;homepage=http://www.example.com/
 homepage=default.html
+
+; Delay load homepage on startup
+startup_load_delayed=false
+; Delay in msec
+startup_load_delay=200
+
 java=false
 javascript=true
 ; handle window.open?
 javascript_can_open_windows=false
 ; handle window.close ?
 javascript_can_close_windows=false
-; And do not close application, show default homepage
-show_homepage_on_window_close=true
-
 webgl=false
 plugins=true
 ; Trust any certificate by default
 ignore_ssl_errors=true
+; Don't close application, show default homepage. Used with javascript window.close()
+show_homepage_on_window_close=true
 
+; Disable reaction on keyboard
+disable_hotkeys=false
 
 [inspector]
 ; Call web-inspector by Ctrl+Shift+I
@@ -36,15 +43,17 @@ visible=false
 
 [attach]
 ; Attach files content then page loaded. Styles goes first
-; Define each file full path and splt with comma
+; Define each file full path and split with comma
 styles=
 javascripts=
 
 [event-sounds]
 enable=false
 ; full-path to sound file
-; format - supported by Qt
+; format - supported by Qt or system
+; Sound for click anywhere in window
 ;window-clicked=window-clicked.wav
+; Sound for click on a link
 ;link-clicked=link-clicked.wav
 
 [cache]
@@ -58,54 +67,54 @@ clean-on-start=false
 clean-on-exit=false
 
 [application]
+; Used in User-Agent header
 organization=Organization
 organization-domain=www.example.com
-; First part of User-Agent
 name=QtWebkitKiosk
-; Second part of User-Agent
-version=1.04.06
-; Appears like %name%/%version%
-
+version=1.05.10
 
 [printing]
-; If enabled - javascript window.print() working!
-; And Ctrl+P
 enable=false
-; Show printing dialog?
 show-printer-dialog=false
-; Well, may be you need 'PDF' name?
 printer=default
-; Some page setup...
 page_margin_left=0
 page_margin_top=0
 page_margin_right=0
 page_margin_bottom=0
 
 [proxy]
-; Use proxy?
 enable=false
-; Use system proxy settings?
 system=true
-; Or not...
 host=proxy.example.com
 port=3128
-; Need authorization?
 auth=false
 username=username
 password=password
 
 [view]
-; Size mode: only one at time, and checked in this order
 fullscreen=true
 maximized=false
 fixed-size=false
-; If fixed size - define it
 fixed-width=800
 fixed-height=600
-; Place window in center of desktop
 fixed-centered=true
-; If not centered - define default position
+
+; Another window manager hint to prevent showing other windows or taskbar
+stay_on_top=false
+
+;; Minimum window size, default - 320x200
+;minimum-width=320
+;minimum-height=200
+
+; if not centered
 fixed-x=0
 fixed-y=0
 
+; Try to avoid some bogus Windows behaviour when taskbar become visible after window fullscreened...
+startup_resize_delayed=false
+; Delay in msec
+startup_resize_delay=100
+
+; Try to hide window scrollbars for any content overflow. Scrolling works only with keyboard keys. If they not disabled.
+hide_scrollbars=false
 }}}
