@@ -77,6 +77,7 @@ protected:
     void attachJavascripts();
     void attachStyles();
     bool hideScrollbars();
+    bool disableSelection();
     void keyPressEvent(QKeyEvent *event);
 
 private:
@@ -91,6 +92,7 @@ private:
 
     int progress;
     bool isScrollBarsHidden;
+    bool isSelectionDisabled;
 
     void loadSettings(QString ini_file);
 };
