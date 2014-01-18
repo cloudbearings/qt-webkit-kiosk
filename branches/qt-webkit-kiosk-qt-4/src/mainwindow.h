@@ -68,11 +68,15 @@ protected slots:
 
     void desktopResized(int p);
 
+    void delayedWindowResize();
+    void delayedPageLoad();
+
 protected:
 
     void centerFixedSizeWindow();
     void attachJavascripts();
     void attachStyles();
+    bool hideScrollbars();
     void keyPressEvent(QKeyEvent *event);
 
 private:
@@ -86,6 +90,7 @@ private:
     AnyOption *cmdopts;
 
     int progress;
+    bool isScrollBarsHidden;
 
     void loadSettings(QString ini_file);
 };

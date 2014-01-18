@@ -1,3 +1,18 @@
+qt-webkit-kiosk (1.04.07ubuntu1) unstable; urgency=low
+
+  * Version 1.04.07:
+  * Fix scroll to the bottom of page
+  * Merge changes from 1.05.10:
+    - startup delay for window resize and page load
+    - add minimum window size options
+    - add hotkeys for page scroll
+    - add new options:
+      - window on top
+      - hide scrollbars (and disable scroll by mouse)
+      - disable hotkeys
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sat, 18 Jan 2014 18:30:00 +0400
+
 qt-webkit-kiosk (1.04.06ubuntu1) unstable; urgency=low
 
   * Version 1.04.06:
@@ -9,10 +24,10 @@ qt-webkit-kiosk (1.04.05ubuntu1) unstable; urgency=low
 
   * Version 1.04.05:
   * Merge changes from 1.05.06-1.05.07:
-  * + Fix handle link click and sound play
-  * + Fix handle window.close()
-  * + New sounds
-  * + Handle window.close()
+    + Fix handle link click and sound play
+    + Fix handle window.close()
+    + New sounds
+    + Handle window.close()
 
  -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Mon, 22 Jul 2013 23:35:00 +0400
 
