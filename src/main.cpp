@@ -40,8 +40,8 @@
 ****************************************************************************/
 
 #include <signal.h>
-#include "mainwindow.h"
 #include <QApplication>
+#include "mainwindow.h"
 
 static void unixSignalHandler(int signum) {
     qDebug("DBG: main.cpp::unixSignalHandler(). signal = %d\n", signum);

@@ -1,9 +1,8 @@
 #ifndef WEBVIEW_H
 #define WEBVIEW_H
 
+#include <QtGui>
 #include <QtWebKit>
-#include <QtWebKitWidgets/QWebView>
-#include <QtWebKitWidgets/QWebFrame>
 #include <QPrinter>
 #include <qplayer.h>
 #include <fakewebview.h>
@@ -13,7 +12,7 @@ class WebView : public QWebView
     Q_OBJECT
 
 public:
-    explicit WebView(QWidget* parent = 0);
+    WebView(QWidget* parent = 0);
 
     void setSettings(QSettings *settings);
     void loadHomepage();
@@ -25,10 +24,6 @@ public:
 
     void playSound(QString soundSetting);
 
-public slots:
-    void handlePrintRequested(QWebFrame *);
-    void handleUrlChanged(const QUrl &);
-
     // http://slow-tone.blogspot.com/2011/04/qt-hide-scrollbars-qwebview.html?showComment=1318404188431#c5258624438625837585
     void scrollUp();
     void scrollDown();
@@ -36,6 +31,10 @@ public slots:
     void scrollPageDown();
     void scrollHome();
     void scrollEnd();
+
+public slots:
+    void handlePrintRequested(QWebFrame *);
+    void handleUrlChanged(const QUrl &);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -50,7 +49,6 @@ private:
 private slots:
     void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
     void handleWindowCloseRequested();
-
 };
 
 #endif // WEBVIEW_H
