@@ -3,6 +3,11 @@
 
 = ChangeLog for version 1.5 =
 
+== Version 1.05.11 ==
+_Sat, 18 Jan 2014 19:02:00 +0400_
+
+  * Fix scroll to the bottom of page
+
 == Version 1.05.10 ==
 _Sat, 18 Jan 2014 17:45:00 +0400_
 
