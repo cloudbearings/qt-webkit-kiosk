@@ -117,4 +117,7 @@ startup_resize_delay=100
 
 ; Try to hide window scrollbars for any content overflow. Scrolling works only with keyboard keys. If they not disabled.
 hide_scrollbars=false
+
+; Try to hide selection
+disable_selection=true
 }}}
