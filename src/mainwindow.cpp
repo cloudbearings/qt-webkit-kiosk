@@ -102,6 +102,18 @@ MainWindow::MainWindow()
         return;
     }
 
+    setMinimumWidth(320);
+    setMinimumHeight(200);
+
+    quint16 minimalWidth = mainSettings->value("view/minimal-width").toUInt();
+    quint16 minimalHeight = mainSettings->value("view/minimal-height").toUInt();
+    if (minimalWidth) {
+        setMinimumWidth(minimalWidth);
+    }
+    if (minimalHeight) {
+        setMinimumHeight(minimalHeight);
+    }
+
     qDebug() << "Application icon: " << mainSettings->value("application/icon").toString();
     setWindowIcon(QIcon(
        mainSettings->value("application/icon").toString()
@@ -211,7 +223,7 @@ MainWindow::MainWindow()
 
     connect(view, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
     connect(view, SIGNAL(loadStarted()), SLOT(startLoading()));
-    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(QUrl)));
+    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(const QUrl&)));
     connect(view, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
     connect(view, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     connect(view, SIGNAL(iconChanged()), SLOT(pageIconLoaded()));
@@ -224,8 +236,23 @@ MainWindow::MainWindow()
 
     view->page()->view()->setFocusPolicy(Qt::StrongFocus);
     view->setFocusPolicy(Qt::StrongFocus);
-    this->setFocusPolicy(Qt::StrongFocus);
 
+    int delay_resize = 0;
+    if (mainSettings->value("view/startup_resize_delayed").toBool()) {
+        delay_resize = mainSettings->value("view/startup_resize_delay").toInt();
+    }
+    QTimer::singleShot(delay_resize, this, SLOT(delayedWindowResize()));
+
+    int delay_load = 0;
+    if (mainSettings->value("browser/startup_load_delayed").toBool()) {
+        delay_load = mainSettings->value("browser/startup_load_delay").toInt();
+    }
+    QTimer::singleShot(delay_load, this, SLOT(delayedPageLoad()));
+
+}
+
+void MainWindow::delayedWindowResize()
+{
     if (mainSettings->value("view/fullscreen").toBool()) {
         showFullScreen();
     } else if (mainSettings->value("view/maximized").toBool()) {
@@ -234,6 +261,16 @@ MainWindow::MainWindow()
         centerFixedSizeWindow();
     }
 
+    this->setFocusPolicy(Qt::StrongFocus);
+    this->focusWidget();
+
+    if (mainSettings->value("view/stay_on_top").toBool()) {
+        setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+    }
+}
+
+void MainWindow::delayedPageLoad()
+{
     view->loadHomepage();
 }
 
@@ -296,7 +333,37 @@ void MainWindow::centerFixedSizeWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    if (mainSettings->value("browser/disable_hotkeys").toBool()) {
+        QMainWindow::keyPressEvent(event);
+        return;
+    }
+
     switch (event->key()) {
+    case Qt::Key_Up:
+        view->scrollUp();
+        break;
+    case Qt::Key_Down:
+        view->scrollDown();
+        break;
+    case Qt::Key_PageUp:
+        view->scrollPageUp();
+        break;
+    case Qt::Key_PageDown:
+        view->scrollPageDown();
+        break;
+    case Qt::Key_End:
+        view->scrollEnd();
+        break;
+    case Qt::Key_HomePage:
+        view->loadHomepage();
+        break;
+    case Qt::Key_Home:
+        if (int(event->modifiers()) == Qt::CTRL) {
+            view->loadHomepage();
+        } else {
+            view->scrollHome();
+        }
+        break;
     case Qt::Key_Q:
         if (int(event->modifiers()) == Qt::CTRL) {
             clearCacheOnExit();
@@ -405,6 +472,21 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("view/fixed-y", 0);
     }
 
+    if (!mainSettings->contains("view/startup_resize_delayed")) {
+        mainSettings->setValue("view/startup_resize_delayed", false);
+    }
+    if (!mainSettings->contains("view/startup_resize_delay")) {
+        mainSettings->setValue("view/startup_resize_delay", 2000);
+    }
+
+    if (!mainSettings->contains("view/hide_scrollbars")) {
+        mainSettings->setValue("view/hide_scrollbars", false);
+    }
+
+    if (!mainSettings->contains("view/stay_on_top")) {
+        mainSettings->setValue("view/stay_on_top", false);
+    }
+
 
     if (!mainSettings->contains("browser/homepage")) {
         mainSettings->setValue("browser/homepage", RESOURCES"default.html");
@@ -434,6 +516,17 @@ void MainWindow::loadSettings(QString ini_file)
     // Show default homepage if window closed by javascript
     if (!mainSettings->contains("browser/show_homepage_on_window_close")) {
         mainSettings->setValue("browser/show_homepage_on_window_close", true);
+    }
+
+    if (!mainSettings->contains("browser/startup_load_delayed")) {
+        mainSettings->setValue("browser/startup_load_delayed", false);
+    }
+    if (!mainSettings->contains("browser/startup_load_delay")) {
+        mainSettings->setValue("browser/startup_load_delay", 100);
+    }
+
+    if (!mainSettings->contains("browser/disable_hotkeys")) {
+        mainSettings->setValue("browser/disable_hotkeys", false);
     }
 
 
@@ -521,6 +614,12 @@ void MainWindow::setProgress(int p)
 {
     progress = p;
     adjustTitle();
+
+    // 1. Hide scrollbars (and add some styles)
+    // If there complete head and body start loaded...
+    if (!isScrollBarsHidden) {
+        isScrollBarsHidden = hideScrollbars();
+    }
 }
 
 void MainWindow::desktopResized(int p)
@@ -538,6 +637,8 @@ void MainWindow::desktopResized(int p)
 void MainWindow::startLoading()
 {
     progress = 0;
+    isScrollBarsHidden = false;
+
     adjustTitle();
 
     QWebSettings::clearMemoryCaches();
@@ -560,8 +661,30 @@ void MainWindow::finishLoading(bool)
     progress = 100;
     adjustTitle();
 
+    // 1. Hide scrollbars (and add some styles)
+    if (!isScrollBarsHidden) {
+        isScrollBarsHidden = hideScrollbars();
+    }
+    // 2. Add more styles which can override previous styles...
     attachStyles();
     attachJavascripts();
+}
+
+/**
+ * @return bool - true - if don't need to hide scrollbars or hide them, false - if need, but there is no html body loaded.
+ * @brief MainWindow::hideScrollbars
+ */
+bool MainWindow::hideScrollbars()
+{
+    if (mainSettings->value("view/hide_scrollbars").toBool()) {
+
+        qDebug() << "Try to hide scrollbars...";
+
+        view->page()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
+        view->page()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
+    }
+
+    return true;
 }
 
 void MainWindow::attachJavascripts()
