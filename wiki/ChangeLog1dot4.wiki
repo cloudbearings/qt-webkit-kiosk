@@ -3,6 +3,13 @@
 
 = ChangeLog for version 1.4 =
 
+== Version 1.04.08 ==
+_Sat, 18 Jan 2014 22:11:00 +0400_
+
+  * Merge changes from 1.05.12:
+    * Fix styles and scripts inserting into page after it's loaded
+    * Add option to disable text selection
+
 == Version 1.04.07 ==
 _Sat, 18 Jan 2014 18:30:00 +0400_
 
