@@ -1,9 +1,9 @@
 #summary usage
-#labels Phase-Support
+#labels Phase-Support,Featured
 
 = Commandline usage for qt-webkit-kiosk =
 
-For version 1.04.04 , 1.05.05
+For version 1.04.07 , 1.05.10
 
 {{{
 Usage: 
