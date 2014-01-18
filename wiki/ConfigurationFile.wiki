@@ -29,7 +29,7 @@ webgl=false
 plugins=true
 ; Trust any certificate by default
 ignore_ssl_errors=true
-; Don't close application, show default homepage. Used with javascript window.close()
+; Do not close application, show default homepage. Used with javascript window.close()
 show_homepage_on_window_close=true
 
 ; Disable reaction on keyboard
