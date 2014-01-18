@@ -1,6 +1,7 @@
 #summary changelog for 1.4
+#labels Phase-Support,Featured
 
-= ChangeLog for 1.4 version =
+= ChangeLog for version 1.4 =
 
 == Version 1.04.07 ==
 _Sat, 18 Jan 2014 18:30:00 +0400_
