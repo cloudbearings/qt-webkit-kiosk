@@ -1,4 +1,4 @@
-#summary changelog
+#summary changelog for 1.5
 #labels Phase-Support,Featured
 
 = ChangeLog for version 1.5 =
