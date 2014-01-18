@@ -2,14 +2,16 @@
 #define QPLAYER_H
 
 #include <QtCore>
-#include <QtMultimedia/QMediaPlayer>
+#include <phonon/audiooutput.h>
+#include <phonon/mediaobject.h>
+#include <phonon/backendcapabilities.h>
 
 class QPlayer : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit QPlayer();
+    QPlayer();
 
     void play(QString soundFile);
 
@@ -17,7 +19,8 @@ protected:
 
 private:
 
-    QMediaPlayer *player;
+    Phonon::MediaObject *player;
+    Phonon::AudioOutput *audioOutput;
 
 };
 
