@@ -10,7 +10,7 @@ QT       += core gui network webkit phonon
 CONFIG += console
 TARGET = qt-webkit-kiosk
 TEMPLATE = app
-VERSION = 1.04.08
+VERSION = 1.04.09
 
 message(Qt version: $$[QT_VERSION])
 message(Qt is installed in $$[QT_INSTALL_PREFIX])

@@ -1,3 +1,13 @@
+qt-webkit-kiosk (1.04.09sergey1) unstable; urgency=low
+
+  * Version 1.04.09:
+  * Merge changes from 1.05.13:
+    + Fix turning off text selection after next page load
+    + Add page load indication with progress bar
+    + Add option to scale pages
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Sun, 19 Jan 2014 18:07:00 +0400
+
 qt-webkit-kiosk (1.04.08sergey1) unstable; urgency=low
 
   * Version 1.04.08:

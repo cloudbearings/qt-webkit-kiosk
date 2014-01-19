@@ -126,10 +126,12 @@ void WebView::mousePressEvent(QMouseEvent *event)
 
 void WebView::handleUrlChanged(const QUrl &url)
 {
-    qDebug() << "url Changed!" << url.toString();
+    if (this->url().toString() != url.toString()) {
+        qDebug() << "url Changed!" << url.toString();
 
-    this->load(url);
-    qDebug() << "-- load url";
+        this->load(url);
+        qDebug() << "-- load url";
+    }
 
     loader->close();
     loader = NULL;
@@ -163,7 +165,9 @@ void WebView::playSound(QString soundSetting)
 
 QWebView *WebView::createWindow(QWebPage::WebWindowType type)
 {
-    Q_UNUSED(type);
+    if (type != QWebPage::WebBrowserWindow) {
+        return NULL;
+    }
 
     if (loader == NULL) {
         loader = new FakeWebView(this);
