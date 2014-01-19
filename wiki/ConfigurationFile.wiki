@@ -71,7 +71,7 @@ clean-on-exit=false
 organization=Organization
 organization-domain=www.example.com
 name=QtWebkitKiosk
-version=1.05.12
+version=1.05.13
 
 [printing]
 enable=false
@@ -120,4 +120,10 @@ hide_scrollbars=false
 
 ; Try to hide selection
 disable_selection=true
+
+; Show progress bar at page top then web-page loading
+show_load_progress=true
+
+; Page scale factor
+page_scale=1.0
 }}}
