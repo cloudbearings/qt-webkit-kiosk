@@ -41,10 +41,8 @@
 
 #include <QtGui>
 #include <QProgressBar>
-#include <QMainWindow>
 #include <QtNetwork>
 #include <QtWebKit>
-#include <QtWebKitWidgets/QWebInspector>
 #include "webview.h"
 #include "anyoption.h"
 
@@ -53,7 +51,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow();
+    MainWindow();
 
     void clearCache();
     void clearCacheOnExit();

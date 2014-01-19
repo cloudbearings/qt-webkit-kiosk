@@ -3,13 +3,8 @@
 #include <QtGui>
 #include <QtWebKit>
 #include "webview.h"
-#include <QNetworkReply>
-#include <QtDebug>
-#include <QSslError>
-#include "mainwindow.h"
 
-
-WebView::WebView(QWidget* parent): QWebView(parent)
+WebView::WebView(QWidget* parent) : QWebView(parent)
 {
     player = NULL;
     loader = NULL;
@@ -46,7 +41,7 @@ void WebView::setPage(QWebPage *page)
 
 void WebView::setSettings(QSettings *settings)
 {
-    mainSettings = settings;
+    this->mainSettings = settings;
 
     if (mainSettings->value("printing/enable").toBool()) {
         if (!mainSettings->value("printing/show-printer-dialog").toBool()) {
@@ -61,8 +56,8 @@ void WebView::setSettings(QSettings *settings)
             );
         }
     }
-
 }
+
 
 void WebView::loadHomepage()
 {
@@ -139,8 +134,8 @@ void WebView::handleUrlChanged(const QUrl &url)
     }
 
     loader->close();
-    qDebug() << "-- close loader";
     loader = NULL;
+    qDebug() << "-- close";
 }
 
 QPlayer *WebView::getPlayer()
@@ -175,13 +170,12 @@ QWebView *WebView::createWindow(QWebPage::WebWindowType type)
     }
 
     if (loader == NULL) {
-        qDebug() << "New fake webview loader";
         loader = new FakeWebView(this);
         QWebPage *newWeb = new QWebPage(loader);
         loader->setAttribute(Qt::WA_DeleteOnClose, true);
         loader->setPage(newWeb);
 
-        connect(loader, SIGNAL(urlChanged(const QUrl&)), SLOT(handleUrlChanged(const QUrl&)));
+        connect(loader, SIGNAL(urlChanged(QUrl)), SLOT(handleUrlChanged(const QUrl&)));
     }
 
     return loader;
@@ -239,4 +233,3 @@ void WebView::scrollHome()
     QWebFrame* frame = this->page()->mainFrame();
     frame->setScrollPosition(QPoint(0, 0));
 }
-
