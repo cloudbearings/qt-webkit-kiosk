@@ -3,6 +3,14 @@
 
 = ChangeLog for version 1.4 =
 
+== Version 1.04.09 ==
+_Sun, 19 Jan 2014 18:07:00 +0400_
+
+  * Merge changes from 1.05.13:
+    * Fix turning off text selection after next page load
+    * Add page load indication with progress bar
+    * Add option to scale pages
+
 == Version 1.04.08 ==
 _Sat, 18 Jan 2014 22:11:00 +0400_
 
