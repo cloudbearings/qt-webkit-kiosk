@@ -3,6 +3,13 @@
 
 = ChangeLog for version 1.5 =
 
+== Version 1.05.13 ==
+_Sun, 19 Jan 2014 19:15:00 +0400_
+
+  * Fix turning off text selection after next page load
+  * Add page load indication with progress bar
+  * Add option to scale pages
+
 == Version 1.05.12 ==
 _Sat, 18 Jan 2014 21:44:00 +0400_
 
