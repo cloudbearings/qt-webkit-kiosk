@@ -1,5 +1,5 @@
 #summary downloads news
-#labels Phase-Deploy,Phase-Support
+#labels Phase-Deploy,Phase-Support,Featured
 
 = Downloads =
 
