@@ -1,0 +1,14 @@
+#summary downloads news
+#labels Phase-Deploy,Phase-Support
+
+= Downloads =
+
+New downloads went to [https://drive.google.com/folderview?id=0B6CU04AyADvoV19PMlhJSVA2TDQ&usp=sharing Google Drive public folder].
+
+Also available [https://drive.google.com/folderview?id=0B6CU04AyADvoNlRqeExCeXpiUDQ&usp=sharing Additional packages] public folder.
+
+== Version 1.04.09 goes Lucid ==
+_Sun Jan 26 19:47:47 MSK 2014_
+
+  * Build for Ubuntu Lucid x86 using Qt-4.8.5.
+  * Need `qt48-x11-<any>-libs` from Additional packages.
