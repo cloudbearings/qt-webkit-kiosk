@@ -12,3 +12,4 @@ _Sun Jan 26 19:47:47 MSK 2014_
 
   * Build for Ubuntu Lucid x86 using Qt-4.8.5.
   * Need `qt48-x11-<any>-libs` from Additional packages.
+  * Used gcc-4.8.1 from testing toolchain.
