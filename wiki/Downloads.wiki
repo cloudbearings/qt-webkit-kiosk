@@ -7,6 +7,13 @@ New downloads went to [https://drive.google.com/folderview?id=0B6CU04AyADvoV19PM
 
 Also available [https://drive.google.com/folderview?id=0B6CU04AyADvoNlRqeExCeXpiUDQ&usp=sharing Additional packages] public folder.
 
+== Qt Webkit Kiosk goes Launchpad ==
+_Wed Jan 29 04:40:00 MSK 2014_
+
+  * Main PPA: ppa:sergey-dryabzhinsky/qt-webkit-kiosk
+  * Additional: ppa:sergey-dryabzhinsky/qt-builds
+  * Will be main archive if all went well...
+
 == Version 1.04.09 goes Lucid ==
 _Sun Jan 26 19:47:47 MSK 2014_
 
