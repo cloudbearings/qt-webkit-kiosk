@@ -15,6 +15,7 @@ public:
     WebView(QWidget* parent = 0);
 
     void setSettings(QSettings *settings);
+    void loadCustomPage(QString uri);
     void loadHomepage();
     void initSignals();
 
