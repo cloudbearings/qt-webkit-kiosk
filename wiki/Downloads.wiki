@@ -10,6 +10,12 @@ Also available [https://drive.google.com/folderview?id=0B6CU04AyADvoNlRqeExCeXpi
 For windows available [https://drive.google.com/folderview?id=0B6CU04AyADvoXzUxdW5KeEt5cW8&usp=sharing Qt bundles] public folder.
 It needed by installer without Qt.
 
+== No Google Code downloads ==
+_Sun Mar 16 02:53:00 MSK 2014_
+
+  Starting from versions 1.04.10 and 1.05.14 all downloads are on Google Drive.
+  All old downloads - deleted.
+
 == Installer without Qt ==
 _Sat Feb 08 20:46:00 MSK 2014_
 
