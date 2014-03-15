@@ -10,7 +10,16 @@ QT       += core gui network webkit phonon
 CONFIG += console
 TARGET = qt-webkit-kiosk
 TEMPLATE = app
-VERSION = 1.04.09
+VERSION = 1.04.10
+
+CONFIG(debug, debug|release) {
+# here comes debug specific statements
+    message(Debug build)
+} else {
+# here comes release specific statements
+    CONFIG -= debug
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
 
 message(Qt version: $$[QT_VERSION])
 message(Qt is installed in $$[QT_INSTALL_PREFIX])
@@ -38,7 +47,9 @@ SOURCES += main.cpp\
     anyoption.cpp \
     qplayer.cpp \
     fakewebview.cpp \
-    cachingnm.cpp
+    cachingnm.cpp \
+    socketpair.cpp \
+    unixsignals.cpp
 
 HEADERS  += mainwindow.h \
     webview.h \
@@ -46,7 +57,9 @@ HEADERS  += mainwindow.h \
     config.h \
     qplayer.h \
     fakewebview.h \
-    cachingnm.h
+    cachingnm.h \
+    socketpair.h \
+    unixsignals.h
 
 # INSTALL
 

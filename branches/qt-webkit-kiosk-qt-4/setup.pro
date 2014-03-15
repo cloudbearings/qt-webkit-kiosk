@@ -5,7 +5,16 @@
 #-------------------------------------------------
 
 TEMPLATE = subdirs
-CONFIG += ordered
+CONFIG += ordered warn_on
+
+CONFIG(debug, debug|release) {
+# here comes debug specific statements
+    message(Debug build)
+} else {
+# here comes release specific statements
+    CONFIG -= debug
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
 
 SUBDIRS += src/qt-webkit-kiosk.pro
 

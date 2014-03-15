@@ -45,6 +45,7 @@
 #include <QtWebKit>
 #include "webview.h"
 #include "anyoption.h"
+#include "unixsignals.h"
 
 class MainWindow : public QMainWindow
 {
@@ -52,6 +53,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
+    void init(AnyOption *cmdopts);
 
     void clearCache();
     void clearCacheOnExit();
@@ -71,6 +73,13 @@ protected slots:
 
     void delayedWindowResize();
     void delayedPageLoad();
+
+    // TERM or INT - Quit from App
+    void unixSignalQuit();
+    // USR1 - Reload config and back to homepage, or load page from config
+    void unixSignalUsr1();
+    // USR2 - Back to homepage, or load page from config
+    void unixSignalUsr2();
 
 protected:
 
@@ -92,10 +101,14 @@ private:
     QKeyEvent * eventExit;
 
     AnyOption *cmdopts;
+    UnixSignals *handler;
 
     int progress;
     bool isScrollBarsHidden;
     bool isSelectionDisabled;
 
     void loadSettings(QString ini_file);
+
+    QTimer *delayedResize;
+    QTimer *delayedLoad;
 };
