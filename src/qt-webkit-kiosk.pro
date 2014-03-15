@@ -5,12 +5,12 @@
 #-------------------------------------------------
 
 
-QT       += core gui network webkit multimedia widgets webkitwidgets printsupport
+QT       += core gui network webkit phonon
 
 CONFIG += console
 TARGET = qt-webkit-kiosk
 TEMPLATE = app
-VERSION = 1.05.14
+VERSION = 1.04.10
 
 CONFIG(debug, debug|release) {
 # here comes debug specific statements
@@ -48,8 +48,8 @@ SOURCES += main.cpp\
     qplayer.cpp \
     fakewebview.cpp \
     cachingnm.cpp \
-    unixsignals.cpp \
-    socketpair.cpp
+    socketpair.cpp \
+    unixsignals.cpp
 
 HEADERS  += mainwindow.h \
     webview.h \
@@ -58,8 +58,8 @@ HEADERS  += mainwindow.h \
     qplayer.h \
     fakewebview.h \
     cachingnm.h \
-    unixsignals.h \
-    socketpair.h
+    socketpair.h \
+    unixsignals.h
 
 # INSTALL
 

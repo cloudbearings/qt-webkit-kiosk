@@ -41,10 +41,8 @@
 
 #include <QtGui>
 #include <QProgressBar>
-#include <QMainWindow>
 #include <QtNetwork>
 #include <QtWebKit>
-#include <QtWebKitWidgets/QWebInspector>
 #include "webview.h"
 #include "anyoption.h"
 #include "unixsignals.h"
@@ -54,8 +52,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow();
-
+    MainWindow();
     void init(AnyOption *cmdopts);
 
     void clearCache();
@@ -76,7 +73,6 @@ protected slots:
 
     void delayedWindowResize();
     void delayedPageLoad();
-
 
     // TERM or INT - Quit from App
     void unixSignalQuit();

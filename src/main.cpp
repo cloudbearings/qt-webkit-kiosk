@@ -1,10 +1,17 @@
 /****************************************************************************
 **
-** Copyright (C) 2011 Sergey Dryabzhinsky
+** Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
 ** All rights reserved.
-** Contact: Sergey Dryabzhinsky (sergey.dryabzhinsky@gmail.com)
+** Contact: Nokia Corporation (qt-info@nokia.com)
 **
 ** This file is part of the examples of the Qt Toolkit.
+**
+** $QT_BEGIN_LICENSE:LGPL$
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
@@ -58,7 +65,7 @@ bool launch(AnyOption *cmdopts)
 
     cmdopts->setVersion(VERSION);
 
-    cmdopts->processCommandArgs( QCoreApplication::arguments().length(), QCoreApplication::arguments() );
+    cmdopts->processCommandArgs( QCoreApplication::argc(), QCoreApplication::argv() );
 
     if (cmdopts->getFlag('h') || cmdopts->getFlag("help")) {
         qDebug(">> Help option in command prompt...");

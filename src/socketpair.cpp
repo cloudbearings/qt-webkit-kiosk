@@ -12,7 +12,7 @@ bool SocketPair::create()
 {
     server->listen();
 
-    QTcpSocket *active = new QTcpSocket(this);
+    QTcpSocket *active = new QTcpSocket(0);
     active->connectToHost("127.0.0.1", server->serverPort());
 
     // need more time as working with embedded
@@ -25,7 +25,7 @@ bool SocketPair::create()
         return false;
 
     QTcpSocket *passive = server->nextPendingConnection();
-    passive->setParent(this);
+    passive->setParent(0);
 
     endPoints[0] = active;
     endPoints[1] = passive;
