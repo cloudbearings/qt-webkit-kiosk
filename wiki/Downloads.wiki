@@ -26,7 +26,7 @@ _Sat Feb 08 20:46:00 MSK 2014_
 _Wed Jan 29 04:40:00 MSK 2014_
 
   * Main PPA: ppa:sergey-dryabzhinsky/qt-webkit-kiosk
-  * Additional: ppa:sergey-dryabzhinsky/qt-builds
+  * Additional: ppa:sergey-dryabzhinsky/qt48
   * Will be main archive if all went well...
 
 == Version 1.04.09 goes Lucid ==
