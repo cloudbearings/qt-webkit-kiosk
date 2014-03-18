@@ -4,9 +4,14 @@
 = Introduction =
 
   # Download sources archive
-  # You'll need to install the developer tools and libraries for Qt, QtWebkit and Phonone.
+  # You'll need to install the developer tools and libraries for Qt, QtWebkit and Phonon.
 
-== Ubuntu 11.10 ==
+== Ubuntu 14.04 ==
+
+  # {{{sudo apt-get install build-essential devscripts fakeroot}}}
+  # {{{sudo apt-get install qtbase5-dev libqt5webkit5-dev qtmultimedia5-dev qtdeclarative5-dev libqt5v8-5-dev qtsystems5-dev qtscript5-dev libpulse-dev libsqlite3-dev}}}
+
+== Ubuntu 12.04+ ==
 
   # {{{sudo apt-get install build-essential devscripts fakeroot}}}
   # {{{sudo apt-get install libqt4-dev libqtwebkit-dev libphonon-dev}}}
