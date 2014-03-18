@@ -3,6 +3,11 @@
 
 = ChangeLog for version 1.4 =
 
+== Version 1.04.11 ==
+_Wed, 19 Mar 2014 01:59:00 +0400_
+
+  * Fix unix signal handling - use socketpair for every listening signal...
+
 == Version 1.04.10 ==
 _Sun, 16 Mar 2014 03:37:00 +0400_
 
