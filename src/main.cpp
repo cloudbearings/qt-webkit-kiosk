@@ -40,6 +40,8 @@
 ****************************************************************************/
 
 #include <QApplication>
+#include <QFile>
+#include <QTextStream>
 #include "mainwindow.h"
 #include "anyoption.h"
 
@@ -49,19 +51,19 @@ bool launch(AnyOption *cmdopts)
     cmdopts->addUsage("");
     cmdopts->addUsage("Usage: ");
     cmdopts->addUsage("");
-    cmdopts->addUsage(" --help -h                       Print usage and exit");
-    cmdopts->addUsage(" --version -v                    Print version and exit");
-    cmdopts->addUsage(" --config options.ini            Configuration INI-file");
-    cmdopts->addUsage(" --uri http://www.example.com/   Open this URI, home page");
-    cmdopts->addUsage(" --clear-cache -C                Clear cached request data");
+    cmdopts->addUsage(" -h --help                           Print usage and exit");
+    cmdopts->addUsage(" -v --version                        Print version and exit");
+    cmdopts->addUsage(" -c --config options.ini             Configuration INI-file");
+    cmdopts->addUsage(" -u --uri http://www.example.com/    Open this URI, home page");
+    cmdopts->addUsage(" -C --clear-cache                    Clear cached request data");
     cmdopts->addUsage("");
 
     cmdopts->setFlag("help", 'h');
     cmdopts->setFlag("version", 'v');
     cmdopts->setFlag("clear-cache", 'C');
 
-    cmdopts->setOption("config");
-    cmdopts->setOption("uri");
+    cmdopts->setOption("config", 'c');
+    cmdopts->setOption("uri", 'u');
 
     cmdopts->setVersion(VERSION);
 
@@ -95,8 +97,9 @@ int main(int argc, char * argv[])
     browser->init(cmdopts);
 
     // executes browser.cleanupSlot() when the Qt framework emits aboutToQuit() signal.
-    QObject::connect(qApp,          SIGNAL(aboutToQuit()),
-                     browser,   SLOT(cleanupSlot()));
+    QObject::connect(qApp, SIGNAL(aboutToQuit()),
+                     browser, SLOT(cleanupSlot()));
 
-    return app.exec();
+    int ret = app.exec();
+    qDebug() << "Application return:" << ret;
 }
