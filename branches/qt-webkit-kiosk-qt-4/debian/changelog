@@ -1,3 +1,10 @@
+qt-webkit-kiosk (1.04.11-1sergey1) unstable; urgency=low
+
+  * Version 1.04.11:
+    + Fix unix signal handling - use socketpair for every listening signal...
+
+ -- Sergey Dryabzhinsky <sergey.dryabzhinsky@gmail.com>  Wed, 19 Mar 2014 01:59:00 +0400
+
 qt-webkit-kiosk (1.04.10-1sergey1) unstable; urgency=low
 
   * Version 1.04.10:
