@@ -41,28 +41,24 @@
 
 #include "config.h"
 
-#include <signal.h>
 #include <QtGui>
 #include <QtNetwork>
 #include <QtWebKit>
 #include <QDebug>
 #include "mainwindow.h"
-#include <QStandardPaths>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QtWebKitWidgets/QWebFrame>
 #include "cachingnm.h"
 
-MainWindow::MainWindow() : QMainWindow()
+MainWindow::MainWindow()
 {
     progress = 0;
     diskCache = NULL;
     mainSettings = NULL;
 
-    handler = new UnixSignals(this);
-    connect(handler, SIGNAL(sigBREAK()), this, SLOT(unixSignalQuit()));
-    connect(handler, SIGNAL(sigTERM()), this, SLOT(unixSignalQuit()));
-    connect(handler, SIGNAL(sigINT()), this, SLOT(unixSignalQuit()));
+    handler = new UnixSignals();
+    connect(handler, SIGNAL(sigBREAK()), SLOT(unixSignalQuit()));
+    connect(handler, SIGNAL(sigTERM()), SLOT(unixSignalQuit()));
+    connect(handler, SIGNAL(sigINT()), SLOT(unixSignalQuit()));
+    connect(handler, SIGNAL(sigHUP()), SLOT(unixSignalHup()));
 
     delayedResize = new QTimer();
     delayedLoad = new QTimer();
@@ -72,16 +68,20 @@ void MainWindow::init(AnyOption *opts)
 {
     cmdopts = opts;
 
-    if (cmdopts->getValue("config")) {
+    if (cmdopts->getValue("config") || cmdopts->getValue('c')) {
         qDebug(">> Config option in command prompt...");
-        loadSettings(QString(cmdopts->getValue("config")));
+        QString cfgPath = cmdopts->getValue('c');
+        if (cfgPath.isEmpty()) {
+            cfgPath = cmdopts->getValue("config");
+        }
+        loadSettings(cfgPath);
     } else {
         loadSettings(QString(""));
     }
 
     if (mainSettings->value("signals/enable").toBool()) {
-        connect(handler, SIGNAL(sigUSR1()), this, SLOT(unixSignalUsr1()));
-        connect(handler, SIGNAL(sigUSR2()), this, SLOT(unixSignalUsr2()));
+        connect(handler, SIGNAL(sigUSR1()), SLOT(unixSignalUsr1()));
+        connect(handler, SIGNAL(sigUSR2()), SLOT(unixSignalUsr2()));
     }
     handler->start();
 
@@ -102,9 +102,13 @@ void MainWindow::init(AnyOption *opts)
        mainSettings->value("application/icon").toString()
     ));
 
-    if (cmdopts->getValue("uri")) {
+    if (cmdopts->getValue("uri") || cmdopts->getValue('u')) {
         qDebug(">> Uri option in command prompt...");
-        mainSettings->setValue("browser/homepage", cmdopts->getValue("uri"));
+        QString uri = cmdopts->getValue('u');
+        if (uri.isEmpty()) {
+            uri = cmdopts->getValue("uri");
+        }
+        mainSettings->setValue("browser/homepage", uri);
     }
 
     QCoreApplication::setOrganizationName(
@@ -142,6 +146,7 @@ void MainWindow::init(AnyOption *opts)
     }
 
     // --- Web View --- //
+
     view = new WebView(this);
 
     // --- Progress Bar --- //
@@ -171,15 +176,15 @@ void MainWindow::init(AnyOption *opts)
         diskCache = new QNetworkDiskCache(this);
         QString location = mainSettings->value("cache/location").toString();
         if (!location.length()) {
-            location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+            location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         }
         diskCache->setCacheDirectory(location);
         diskCache->setMaximumCacheSize(mainSettings->value("cache/size").toUInt());
 
         if (mainSettings->value("cache/clear-on-start").toBool()) {
             diskCache->clear();
-        }
-        else if (cmdopts->getFlag('C') || cmdopts->getFlag("clear-cache")) {
+        } else if (cmdopts->getFlag('C') || cmdopts->getFlag("clear-cache")) {
+            qDebug(">> Clear cache option in command prompt...");
             diskCache->clear();
         }
 
@@ -207,6 +212,7 @@ void MainWindow::init(AnyOption *opts)
     view->settings()->setAttribute(QWebSettings::JavaEnabled,
         mainSettings->value("browser/java").toBool()
     );
+
     view->settings()->setAttribute(QWebSettings::PluginsEnabled,
         mainSettings->value("browser/plugins").toBool()
     );
@@ -224,13 +230,12 @@ void MainWindow::init(AnyOption *opts)
 
     connect(view, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
     connect(view, SIGNAL(loadStarted()), SLOT(startLoading()));
-    connect(view, SIGNAL(urlChanged(const QUrl &)), SLOT(urlChanged(const QUrl &)));
+    connect(view, SIGNAL(urlChanged(QUrl)), SLOT(urlChanged(const QUrl&)));
     connect(view, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
     connect(view, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     connect(view, SIGNAL(iconChanged()), SLOT(pageIconLoaded()));
 
-    QDesktopWidget *desktop = QApplication::desktop();
-    connect(desktop, SIGNAL(resized(int)), SLOT(desktopResized(int)));
+    connect(QApplication::desktop(), SIGNAL(resized(int)), SLOT(desktopResized(int)));
 
     show();
 
@@ -297,6 +302,7 @@ void MainWindow::clearCacheOnExit()
 void MainWindow::cleanupSlot()
 {
     qDebug("Cleanup Slot (application exit)");
+    handler->stop();
     clearCacheOnExit();
     QWebSettings::clearMemoryCaches();
 }
@@ -329,7 +335,6 @@ void MainWindow::centerFixedSizeWindow()
     setFixedSize( widowWidth, widowHeight );
 
 }
-
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -400,12 +405,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     }
 }
 
-/**
- * @TODO: move to separate class
- *
- * @brief MainWindow::loadSettings
- * @param ini_file
- */
 void MainWindow::loadSettings(QString ini_file)
 {
     if (!ini_file.length()) {
@@ -467,12 +466,6 @@ void MainWindow::loadSettings(QString ini_file)
     }
     if (!mainSettings->contains("view/fixed-height")) {
         mainSettings->setValue("view/fixed-height", 600);
-    }
-    if (!mainSettings->contains("view/minimal-width")) {
-        mainSettings->setValue("view/minimal-width", 320);
-    }
-    if (!mainSettings->contains("view/minimal-height")) {
-        mainSettings->setValue("view/minimal-height", 200);
     }
     if (!mainSettings->contains("view/fixed-centered")) {
         mainSettings->setValue("view/fixed-centered", true);
@@ -587,7 +580,7 @@ void MainWindow::loadSettings(QString ini_file)
         mainSettings->setValue("cache/enable", false);
     }
     if (!mainSettings->contains("cache/location")) {
-        QString location = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+        QString location = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
         QDir d = QDir(location);
         location += d.separator();
         location += mainSettings->value("application/name").toString();
@@ -741,6 +734,7 @@ void MainWindow::finishLoading(bool)
 bool MainWindow::hideScrollbars()
 {
     if (mainSettings->value("view/hide_scrollbars").toBool()) {
+
         qDebug("Try to hide scrollbars...");
 
         view->page()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
@@ -761,7 +755,6 @@ bool MainWindow::disableSelection()
         if (!bodyElem.isNull() && !bodyElem.toInnerXml().trimmed().isEmpty()) {
             QWebElement headElem = view->page()->mainFrame()->findFirstElement("head");
             if (headElem.isNull() || headElem.toInnerXml().trimmed().isEmpty()) {
-                qDebug("... html head not loaded ... wait...");
                 return false;
             }
 
@@ -770,7 +763,7 @@ bool MainWindow::disableSelection()
             // http://stackoverflow.com/a/5313735
             QString content;
             content = "<style type=\"text/css\">\n";
-            content += "body, div, p, span, h1, h2, h3, h4, h5, h6, caption, td {\n";
+            content += "body, div, p, span, h1, h2, h3, h4, h5, h6, caption, td, li, dt, dd {\n";
             content += " -moz-user-select: none;\n";
             content += " -khtml-user-select: none;\n";
             content += " -webkit-user-select: none;\n";
@@ -896,7 +889,6 @@ void MainWindow::attachStyles()
     }
 }
 
-
 void MainWindow::pageIconLoaded()
 {
     setWindowIcon(view->icon());
@@ -913,6 +905,22 @@ void MainWindow::unixSignalQuit()
     // No cache clean - quick exit
     qDebug(">> Quit Signal catched. Exiting...");
     QApplication::exit(0);
+}
+
+/**
+ * Do something on Unix SIGHUP signal
+ * Usualy:
+ *  1. Reload config
+ *
+ * @brief MainWindow::unixSignalHup
+ */
+void MainWindow::unixSignalHup()
+{
+    if (cmdopts->getValue("config")) {
+        loadSettings(QString(cmdopts->getValue("config")));
+    } else {
+        loadSettings(QString(""));
+    }
 }
 
 /**

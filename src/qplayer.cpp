@@ -9,12 +9,21 @@ QPlayer::QPlayer()
 void QPlayer::play(QString soundFile)
 {
     if (player == NULL) {
-        player = new QMediaPlayer();
+        audioOutput = new Phonon::AudioOutput(Phonon::MusicCategory, this);
+        player = new Phonon::MediaObject(this);
+
+        player->setTickInterval(1000);
+
+        Phonon::createPath(player, audioOutput);
     }
 
     if (soundFile.length()) {
         player->stop();
-        player->setMedia(QUrl::fromLocalFile(soundFile));
+        player->clearQueue();
+
+        Phonon::MediaSource source(soundFile);
+
+        player->setCurrentSource(source);
         player->play();
     }
 }
