@@ -54,10 +54,11 @@ MainWindow::MainWindow()
     diskCache = NULL;
     mainSettings = NULL;
 
-    handler = new UnixSignals(this);
-    connect(handler, SIGNAL(sigBREAK()), this, SLOT(unixSignalQuit()));
-    connect(handler, SIGNAL(sigTERM()), this, SLOT(unixSignalQuit()));
-    connect(handler, SIGNAL(sigINT()), this, SLOT(unixSignalQuit()));
+    handler = new UnixSignals();
+    connect(handler, SIGNAL(sigBREAK()), SLOT(unixSignalQuit()));
+    connect(handler, SIGNAL(sigTERM()), SLOT(unixSignalQuit()));
+    connect(handler, SIGNAL(sigINT()), SLOT(unixSignalQuit()));
+    connect(handler, SIGNAL(sigHUP()), SLOT(unixSignalHup()));
 
     delayedResize = new QTimer();
     delayedLoad = new QTimer();
@@ -67,16 +68,20 @@ void MainWindow::init(AnyOption *opts)
 {
     cmdopts = opts;
 
-    if (cmdopts->getValue("config")) {
-        qDebug() << ">> Config option in command prompt...";
-        loadSettings(QString(cmdopts->getValue("config")));
+    if (cmdopts->getValue("config") || cmdopts->getValue('c')) {
+        qDebug(">> Config option in command prompt...");
+        QString cfgPath = cmdopts->getValue('c');
+        if (cfgPath.isEmpty()) {
+            cfgPath = cmdopts->getValue("config");
+        }
+        loadSettings(cfgPath);
     } else {
         loadSettings(QString(""));
     }
 
     if (mainSettings->value("signals/enable").toBool()) {
-        connect(handler, SIGNAL(sigUSR1()), this, SLOT(unixSignalUsr1()));
-        connect(handler, SIGNAL(sigUSR2()), this, SLOT(unixSignalUsr2()));
+        connect(handler, SIGNAL(sigUSR1()), SLOT(unixSignalUsr1()));
+        connect(handler, SIGNAL(sigUSR2()), SLOT(unixSignalUsr2()));
     }
     handler->start();
 
@@ -97,9 +102,13 @@ void MainWindow::init(AnyOption *opts)
        mainSettings->value("application/icon").toString()
     ));
 
-    if (cmdopts->getValue("uri")) {
-        qDebug() << ">> Uri option in command prompt...";
-        mainSettings->setValue("browser/homepage", cmdopts->getValue("uri"));
+    if (cmdopts->getValue("uri") || cmdopts->getValue('u')) {
+        qDebug(">> Uri option in command prompt...");
+        QString uri = cmdopts->getValue('u');
+        if (uri.isEmpty()) {
+            uri = cmdopts->getValue("uri");
+        }
+        mainSettings->setValue("browser/homepage", uri);
     }
 
     QCoreApplication::setOrganizationName(
@@ -174,8 +183,8 @@ void MainWindow::init(AnyOption *opts)
 
         if (mainSettings->value("cache/clear-on-start").toBool()) {
             diskCache->clear();
-        }
-        if (cmdopts->getFlag('C') || cmdopts->getFlag("clear-cache")) {
+        } else if (cmdopts->getFlag('C') || cmdopts->getFlag("clear-cache")) {
+            qDebug(">> Clear cache option in command prompt...");
             diskCache->clear();
         }
 
@@ -293,7 +302,7 @@ void MainWindow::clearCacheOnExit()
 void MainWindow::cleanupSlot()
 {
     qDebug("Cleanup Slot (application exit)");
-    UnixSignals::sp.close();
+    handler->stop();
     clearCacheOnExit();
     QWebSettings::clearMemoryCaches();
 }
@@ -326,7 +335,6 @@ void MainWindow::centerFixedSizeWindow()
     setFixedSize( widowWidth, widowHeight );
 
 }
-
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -660,7 +668,7 @@ void MainWindow::startLoading()
         view->page()->mainFrame()->setZoomFactor(mainSettings->value("view/page_scale").toReal());
     }
 
-    qDebug() << "Start loading...";
+    qDebug("Start loading...");
 }
 
 void MainWindow::setProgress(int p)
@@ -755,7 +763,7 @@ bool MainWindow::disableSelection()
             // http://stackoverflow.com/a/5313735
             QString content;
             content = "<style type=\"text/css\">\n";
-            content += "body, div, p, span, h1, h2, h3, h4, h5, h6, caption, td {\n";
+            content += "body, div, p, span, h1, h2, h3, h4, h5, h6, caption, td, li, dt, dd {\n";
             content += " -moz-user-select: none;\n";
             content += " -khtml-user-select: none;\n";
             content += " -webkit-user-select: none;\n";
@@ -897,6 +905,22 @@ void MainWindow::unixSignalQuit()
     // No cache clean - quick exit
     qDebug(">> Quit Signal catched. Exiting...");
     QApplication::exit(0);
+}
+
+/**
+ * Do something on Unix SIGHUP signal
+ * Usualy:
+ *  1. Reload config
+ *
+ * @brief MainWindow::unixSignalHup
+ */
+void MainWindow::unixSignalHup()
+{
+    if (cmdopts->getValue("config")) {
+        loadSettings(QString(cmdopts->getValue("config")));
+    } else {
+        loadSettings(QString(""));
+    }
 }
 
 /**
