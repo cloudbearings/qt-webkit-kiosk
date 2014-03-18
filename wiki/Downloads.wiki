@@ -10,6 +10,8 @@ Also available [https://drive.google.com/folderview?id=0B6CU04AyADvoNlRqeExCeXpi
 For windows available [https://drive.google.com/folderview?id=0B6CU04AyADvoXzUxdW5KeEt5cW8&usp=sharing Qt bundles] public folder.
 It needed by installer without Qt.
 
+If you have any suggestions about packaging - fill the issue.
+
 == No Google Code downloads ==
 _Sun Mar 16 02:53:00 MSK 2014_
 
