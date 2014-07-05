@@ -5,7 +5,7 @@
 
 New downloads went to [https://drive.google.com/folderview?id=0B6CU04AyADvoV19PMlhJSVA2TDQ&usp=sharing Google Drive public folder].
 
-Also available [https://drive.google.com/folderview?id=0B6CU04AyADvoNlRqeExCeXpiUDQ&usp=sharing Additional lunux packages] public folder.
+Also available [https://drive.google.com/folderview?id=0B6CU04AyADvoNlRqeExCeXpiUDQ&usp=sharing Additional linux packages] public folder.
 
 For windows available [https://drive.google.com/folderview?id=0B6CU04AyADvoXzUxdW5KeEt5cW8&usp=sharing Qt bundles] public folder.
 It needed by installer without Qt.
